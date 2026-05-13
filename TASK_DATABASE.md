@@ -1518,13 +1518,13 @@ If any v1 code silently calls a v2 path, add a `raise NotImplementedError("v2 on
 | 5 | Integration test | v1 | ✓ |
 | G | Synthetic data generator (§32.6) | v1 | ✓ |
 | R | Replay engine | v1 | ✓ |
-| 6 | 6.1 Artifact directory structure | v1 | ☐ |
-| 6 | 6.2 Artifact writer (artifact_writer.py) | v1 | ☐ |
-| 6 | 6.3 Benchmark report generator (report_generator.py) | v1 | ☐ |
-| 6 | 6.4 Streamlit dashboard skeleton (app.py + 8 pages) | v1 | ☐ |
-| 6 | 6.5 Persistence evolution visualization | v1 | ☐ |
-| 6 | 6.6 Provenance lineage visualization (DAG) | v1 | ☐ |
-| 6 | 6.7 Forgetting validation explorer | v1 | ☐ |
-| 6 | 6.8 Cross-run comparison dashboard | v1 | ☐ |
-| 6 | 6.9 Replay timeline explorer | v1 | ☐ |
-| 6 | 6.10 Exportable research artifacts | v1 | ☐ |
+| 6 | 6.1 Artifact directory structure | v1 | ✓ |
+| 6 | 6.2 Artifact writer (artifact_writer.py) | v1 | ✓ |
+| 6 | 6.3 Benchmark report generator (report_generator.py) | v1 | ✓ |
+| 6 | 6.4 Streamlit dashboard skeleton (app.py + 8 pages) | v1 | ✓ |
+| 6 | 6.5 Persistence evolution visualization | v1 | ✓ |
+| 6 | 6.6 Provenance lineage visualization (DAG) | v1 | ✓ |
+| 6 | 6.7 Forgetting validation explorer | v1 | ✓ |
+| 6 | 6.8 Cross-run comparison dashboard | v1 | ✓ |
+| 6 | 6.9 Replay timeline explorer | v1 | ✓ |
+| 6 | 6.10 Exportable research artifacts | v1 | ✓ |

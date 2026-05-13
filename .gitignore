@@ -13,4 +13,5 @@ venv/
 *.duckdb.wal
 qdrant_data/
 results/
+artifacts/
 .pytest_cache/
