@@ -266,7 +266,8 @@ def test_leaderboard_ordering(conn):
 # -----------------------------------------------------------------
 
 def test_v2_writer_stubs_raise():
-    for fn in (writers.write_run_scenario, writers.write_memory_entry_snapshot,
+    # write_memory_entry_snapshot promoted to v1 — excluded from this check
+    for fn in (writers.write_run_scenario,
                writers.write_provenance_lineage, writers.write_deletion_record,
                writers.write_memory_conflict, writers.write_governance_action,
                writers.write_behavioral_probe, writers.write_forgetting_validation):

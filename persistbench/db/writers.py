@@ -213,6 +213,30 @@ def write_suite_metrics(conn: duckdb.DuckDBPyConnection, *,
 
 
 # =================================================================
+# LATE-STAGE V1 WRITERS (promoted from v2)
+# =================================================================
+
+def write_memory_entry_snapshot(conn: duckdb.DuckDBPyConnection, *,
+                                run_id: str, scenario_id: str,
+                                entry_id: str, session_id: int,
+                                confidence: float, trust_score: float,
+                                toxicity_score: float,
+                                lifecycle_stage: str) -> None:
+    """Record a point-in-time snapshot of a memory entry's scores.
+
+    Called once per memory entry per session to power trust-evolution
+    charts in the dashboard.
+    """
+    conn.execute("""
+        INSERT OR REPLACE INTO memory_entry_snapshots
+        (run_id, scenario_id, entry_id, session_id,
+         confidence, trust_score, toxicity_score, lifecycle_stage)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, [run_id, scenario_id, entry_id, session_id,
+          confidence, trust_score, toxicity_score, lifecycle_stage])
+
+
+# =================================================================
 # V2 STUBS -- implement when optional tables are needed
 # =================================================================
 
@@ -222,8 +246,8 @@ def write_run_scenario(*args, **kwargs):
 def update_run_scenario_status(*args, **kwargs):
     raise NotImplementedError("run_scenarios is a v2 table")
 
-def write_memory_entry_snapshot(*args, **kwargs):
-    raise NotImplementedError("memory_entry_snapshots is a v2 table")
+def write_behavioral_probe(*args, **kwargs):
+    raise NotImplementedError("behavioral_probes is a v2 table -- define probe set first")
 
 def write_provenance_lineage(*args, **kwargs):
     raise NotImplementedError("provenance_lineage is a v2 table")
@@ -236,9 +260,6 @@ def write_memory_conflict(*args, **kwargs):
 
 def write_governance_action(*args, **kwargs):
     raise NotImplementedError("governance_actions is a v2 table")
-
-def write_behavioral_probe(*args, **kwargs):
-    raise NotImplementedError("behavioral_probes is a v2 table -- define probe set first")
 
 def write_forgetting_validation(*args, **kwargs):
     raise NotImplementedError("forgetting_validation is a v2 table")

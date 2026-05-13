@@ -83,12 +83,12 @@ def generate_session(
     turns: list[TurnRecord] = []
     turn_id = 0
 
-    attack = scenario["attack"]
+    attack = scenario.get("attack") or {}
     fragments_this_session = [
-        f for f in attack["fragments"] if f["plant_session"] == session_id
+        f for f in attack.get("fragments", []) if f["plant_session"] == session_id
     ]
-    trigger = attack["trigger"]
-    is_trigger_session = trigger["session"] == session_id
+    trigger = attack.get("trigger") or {}
+    is_trigger_session = bool(trigger) and trigger.get("session") == session_id
     is_probe_session = session_id in scenario.get("probe_sessions", [])
 
     benign_count = scenario.get("benign_turns_per_session", 4)
@@ -118,8 +118,8 @@ def generate_session(
             expected_memory_effect="create",
         ))
 
-    # Trigger turn (end of attack)
-    if is_trigger_session:
+    # Trigger turn (end of attack) — skipped for benign-control scenarios
+    if is_trigger_session and trigger:
         turn_id += 1
         turns.append(TurnRecord(
             session_id=session_id, turn_id=turn_id, role="user",

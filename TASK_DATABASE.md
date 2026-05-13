@@ -1490,6 +1490,75 @@ If any v1 code silently calls a v2 path, add a `raise NotImplementedError("v2 on
 
 ---
 
+## Pre-v2 Research Loop (added 2026-05-13)
+
+**Goal:** Prove the benchmark works experimentally before expanding to v2.
+Complete the full pipeline on real scenario data, produce real artifacts,
+and have one demonstrable attack lifecycle.
+
+**Constraint:** Do NOT expand v2 until all tasks in this section are ✓.
+
+---
+
+### RL.1 Complete SBMP scenario set (minimum 3)
+
+**Do:**
+- `sbmp-001.yaml` — direct accumulation (existing) ✓
+- `sbmp-002.yaml` — delayed trigger (15 sessions, 5-session dormancy gap) ✓
+- `sbmp-003.yaml` — benign control (no attack, clean baseline) ✓
+
+**Verify:** All 3 scenarios load, generate traces, and replay without error.
+Generator handles `attack: null` / empty fragments list gracefully.
+
+**Design ref:** §33 (SBMP Scenario Catalog)
+
+---
+
+### RL.2 `write_memory_entry_snapshot` promoted to v1
+
+**Do:** Implement point-in-time snapshot writer in `writers.py`.
+Call it from `_run_session()` after each session for every entry in `self._memory`.
+
+**Verify:** `memory_entry_snapshots` table is populated after a replay run.
+Dashboard trust-evolution charts can query per-session trust/confidence/toxicity.
+
+**Design ref:** §37.3 (Trust Evolution Charts)
+
+---
+
+### RL.3 CLI benchmark runner (`persistbench/run_benchmark.py`)
+
+**Do:** End-to-end runner that accepts `--scenario` or `--suite` and produces:
+- DuckDB records (run, scenario, sessions, turns, memory, provenance, metrics)
+- Artifact files (JSON summary, metrics, JSONL trace, provenance graph)
+- HTML + Markdown reports
+
+**Verify:**
+```bash
+python -m persistbench.run_benchmark \
+    --scenario scenarios/sbmp/sbmp-001.yaml \
+    --run-id smoke-001 --db bench.duckdb
+```
+Prints metrics summary and writes artifacts to `artifacts/`.
+
+**Design ref:** §35 (Benchmark Execution Pipeline)
+
+---
+
+### RL.4 End-to-end test suite (`tests/test_end_to_end.py`)
+
+**Do:** 28-test suite covering all 3 SBMP scenarios end-to-end:
+- sbmp-001: APS=1.0, BDI=0 before trigger, BDI>0 after trigger, snapshots written
+- sbmp-002: 15 sessions, trigger in session 14, 5-session dormancy verified
+- sbmp-003: APS=0.0, all probes pass, no adversarial memory, no snapshots
+- Cross-scenario: attack APS > control APS, control BDI < attacked BDI
+- Artifact pipeline: run summary + HTML report generated for all 3 scenarios
+- Suite metrics: aggregated across all 3 runs
+
+**Design ref:** §35 (end-to-end verification)
+
+---
+
 ## Progress tracker
 
 | Phase | Task | Scope | Done |
@@ -1528,3 +1597,7 @@ If any v1 code silently calls a v2 path, add a `raise NotImplementedError("v2 on
 | 6 | 6.8 Cross-run comparison dashboard | v1 | ✓ |
 | 6 | 6.9 Replay timeline explorer | v1 | ✓ |
 | 6 | 6.10 Exportable research artifacts | v1 | ✓ |
+| RL | RL.1 SBMP scenarios: 001 (existing) + 002 (delayed) + 003 (control) | v1 | ✓ |
+| RL | RL.2 write_memory_entry_snapshot promoted to v1 | v1 | ✓ |
+| RL | RL.3 CLI benchmark runner (run_benchmark.py) | v1 | ✓ |
+| RL | RL.4 End-to-end test suite (28 tests, 3 scenarios) | v1 | ✓ |

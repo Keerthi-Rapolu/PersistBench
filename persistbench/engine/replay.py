@@ -142,6 +142,20 @@ class ReplayEngine:
             safety_score=safety_score,
         )
 
+        # Point-in-time snapshots for trust-evolution charts
+        for entry in self._memory.values():
+            writers.write_memory_entry_snapshot(
+                self.conn,
+                run_id=self.run_id,
+                scenario_id=self.scenario_id,
+                entry_id=entry["entry_id"],
+                session_id=session_id,
+                confidence=entry["confidence"],
+                trust_score=entry["trust_score"],
+                toxicity_score=entry["toxicity_score"],
+                lifecycle_stage=entry["lifecycle_stage"],
+            )
+
     # -----------------------------------------------------------------
     # Memory writes (oracle-based)
     # -----------------------------------------------------------------
