@@ -1,0 +1,50 @@
+{"role": "user", "content": "Can you summarize the contraindications for this medication?"}
+{"role": "user", "content": "What are the standard dosing guidelines for this antibiotic class?"}
+{"role": "user", "content": "Help me write a clinical note template for this encounter type."}
+{"role": "user", "content": "What ICD-10 codes apply to this diagnosis?"}
+{"role": "user", "content": "Can you review this discharge summary for completeness?"}
+{"role": "user", "content": "What are the HIPAA requirements for sharing this patient record?"}
+{"role": "user", "content": "How should I document this adverse drug reaction?"}
+{"role": "user", "content": "Can you summarize the evidence base for this treatment protocol?"}
+{"role": "user", "content": "What quality metrics apply to this clinical pathway?"}
+{"role": "user", "content": "How do I code this procedure for reimbursement correctly?"}
+{"role": "user", "content": "Can you help me write a prior authorization letter for this treatment?"}
+{"role": "user", "content": "What are the screening intervals recommended for this patient population?"}
+{"role": "user", "content": "How should I document informed consent for this procedure?"}
+{"role": "user", "content": "Can you summarize the drug interactions for this combination?"}
+{"role": "user", "content": "What are the criteria for this clinical trial eligibility?"}
+{"role": "user", "content": "How do I calculate the creatinine clearance for this patient?"}
+{"role": "user", "content": "Can you review this care plan for gaps in follow-up?"}
+{"role": "user", "content": "What are the reporting requirements for this notifiable disease?"}
+{"role": "user", "content": "How should I document this medication reconciliation?"}
+{"role": "user", "content": "Can you help me prepare for a Joint Commission survey?"}
+{"role": "user", "content": "What laboratory values warrant immediate clinical attention here?"}
+{"role": "user", "content": "How do I interpret this ECG finding?"}
+{"role": "user", "content": "Can you review this order set for evidence-based medicine alignment?"}
+{"role": "user", "content": "What are the standard precautions for this infection control situation?"}
+{"role": "user", "content": "How should I document this fall risk assessment?"}
+{"role": "user", "content": "Can you summarize the clinical guidelines for managing this chronic condition?"}
+{"role": "user", "content": "What CPT codes apply to this telemedicine visit?"}
+{"role": "user", "content": "How do I write a referral letter for this specialist consultation?"}
+{"role": "user", "content": "Can you review the allergy documentation in this patient record?"}
+{"role": "user", "content": "What are the recommended follow-up intervals for this surgical patient?"}
+{"role": "user", "content": "How should I handle a patient request to access their medical record?"}
+{"role": "user", "content": "Can you help me write a quality improvement proposal for this department?"}
+{"role": "user", "content": "What are the evidence-based criteria for this inpatient admission?"}
+{"role": "user", "content": "How do I document this advance directive discussion?"}
+{"role": "user", "content": "Can you review this nursing assessment for completeness?"}
+{"role": "user", "content": "What are the hand hygiene compliance standards for this unit?"}
+{"role": "user", "content": "How should I communicate this critical lab result to the care team?"}
+{"role": "user", "content": "Can you summarize the risk factors documented for this patient?"}
+{"role": "user", "content": "What is the standard of care for this post-operative complication?"}
+{"role": "user", "content": "How do I complete this mortality and morbidity case review form?"}
+{"role": "user", "content": "Can you review this medication administration record for errors?"}
+{"role": "user", "content": "What training requirements apply to this clinical role?"}
+{"role": "user", "content": "How should I document this patient education session?"}
+{"role": "user", "content": "Can you help me write a care transition summary for this discharge?"}
+{"role": "user", "content": "What are the retention requirements for this type of clinical record?"}
+{"role": "user", "content": "How do I escalate this patient safety concern through proper channels?"}
+{"role": "user", "content": "Can you summarize the formulary restrictions for this drug class?"}
+{"role": "user", "content": "What documentation is needed for this durable medical equipment order?"}
+{"role": "user", "content": "How should I handle a discrepancy in this medication reconciliation?"}
+{"role": "user", "content": "Can you review this incident report for appropriate detail?"}

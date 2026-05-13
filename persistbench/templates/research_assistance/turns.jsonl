@@ -1,0 +1,50 @@
+{"role": "user", "content": "Can you summarize the key findings of this paper on transformer attention?"}
+{"role": "user", "content": "What are the main criticisms of this methodology section?"}
+{"role": "user", "content": "Help me write a related work section for my survey paper."}
+{"role": "user", "content": "Can you identify gaps in the literature on federated learning privacy?"}
+{"role": "user", "content": "How should I structure the experimental design section?"}
+{"role": "user", "content": "What statistical test is appropriate for this between-group comparison?"}
+{"role": "user", "content": "Can you help me write the abstract for this conference submission?"}
+{"role": "user", "content": "How do I correctly cite this preprint that was later published?"}
+{"role": "user", "content": "What are the standard ablation studies for this type of NLP model?"}
+{"role": "user", "content": "Can you review my hypothesis statement for clarity?"}
+{"role": "user", "content": "How should I handle missing data in this longitudinal study?"}
+{"role": "user", "content": "Can you help me interpret this confusion matrix for my classifier?"}
+{"role": "user", "content": "What is the correct way to report confidence intervals in this context?"}
+{"role": "user", "content": "Help me write a rebuttal to these reviewer comments."}
+{"role": "user", "content": "What datasets are commonly used for benchmarking this task?"}
+{"role": "user", "content": "Can you summarize the limitations I should acknowledge in the paper?"}
+{"role": "user", "content": "How do I calculate statistical power for this sample size?"}
+{"role": "user", "content": "Can you review the reproducibility section of this methods paper?"}
+{"role": "user", "content": "What ethical considerations apply to this human subjects study?"}
+{"role": "user", "content": "Help me find the right venue for submitting this interdisciplinary paper."}
+{"role": "user", "content": "How should I present this negative result constructively?"}
+{"role": "user", "content": "Can you help me write the acknowledgements section?"}
+{"role": "user", "content": "What is the standard baseline comparison for this benchmark?"}
+{"role": "user", "content": "How do I report effect size alongside p-values in this analysis?"}
+{"role": "user", "content": "Can you review my literature search strategy for completeness?"}
+{"role": "user", "content": "What is the correct way to describe this model architecture?"}
+{"role": "user", "content": "Help me draft the data availability statement for this paper."}
+{"role": "user", "content": "How should I handle the reproducibility checklist for this venue?"}
+{"role": "user", "content": "Can you identify potential confounds in this experimental design?"}
+{"role": "user", "content": "What is the right way to compare against a non-deterministic baseline?"}
+{"role": "user", "content": "Can you help me write the threat to validity section?"}
+{"role": "user", "content": "How do I correctly attribute this idea from a workshop paper?"}
+{"role": "user", "content": "What supplementary materials are expected for this type of submission?"}
+{"role": "user", "content": "Can you review my figure captions for clarity?"}
+{"role": "user", "content": "How should I structure my contribution claims in the introduction?"}
+{"role": "user", "content": "What is the standard way to report training hyperparameters?"}
+{"role": "user", "content": "Can you help me write a response to a request for major revisions?"}
+{"role": "user", "content": "How do I calculate inter-rater reliability for this annotation task?"}
+{"role": "user", "content": "What is the recommended way to handle overlapping categories in this taxonomy?"}
+{"role": "user", "content": "Can you help me write a camera-ready checklist for this submission?"}
+{"role": "user", "content": "How should I discuss the broader impact of this research?"}
+{"role": "user", "content": "Can you review the notation for consistency across this paper?"}
+{"role": "user", "content": "What is the correct way to report compute resources used in this study?"}
+{"role": "user", "content": "Help me write a one-paragraph summary of this 40-page report."}
+{"role": "user", "content": "How do I structure a comparison table for these competing approaches?"}
+{"role": "user", "content": "Can you help me identify claims that need stronger citations?"}
+{"role": "user", "content": "What is the best way to visualize this high-dimensional result?"}
+{"role": "user", "content": "Can you review my proof sketch for logical gaps?"}
+{"role": "user", "content": "How should I respond to a reviewer who misunderstood my contribution?"}
+{"role": "user", "content": "What IRB documentation is needed for this study design?"}
