@@ -6,6 +6,28 @@
 
 ---
 
+## Research focus (read this first)
+
+**One-sentence claim:**
+> PersistBench is the first reproducible benchmark for evaluating persistent cross-session adversarial behavior in memory-enabled LLM agent systems.
+
+Everything in this codebase should serve that claim.
+
+**Core scope (v1):**
+1. Persistent attack benchmark (SBMP / TSCC / CACP scenarios)
+2. Longitudinal evaluation engine (short / medium / long horizon)
+3. Memory provenance (tamper-evident append-only event log)
+4. Reproducible metrics (APS, RLS, UPS, BDI, CRA)
+
+**Deferred to v2:**
+- Real-time streaming / Kafka / telemetry
+- Vector DB integrations (Qdrant, pgvector, Weaviate, Pinecone)
+- Multi-agent orchestration
+- Governance automation
+- Advanced UI polish
+
+---
+
 ## How to use this doc
 
 Tasks are ordered by dependency — complete them top to bottom.  
@@ -18,12 +40,11 @@ Each task has exactly three parts:
 Do not skip ahead. Tasks in Phase 2 import from Phase 1.  
 Tasks in Phase 3 assume Phase 2 writers are working.
 
+Tasks marked **(v2)** are part of the schema for completeness but do not need implementation now.
+
 ---
 
-## Phase 0 — Decisions before you write a line of code
-
-Two questions must be answered before implementation starts.  
-They affect the schema and whether you need Qdrant at all.
+## Phase 0 — Decisions (DECIDED)
 
 ---
 
@@ -43,41 +64,33 @@ pip install --upgrade duckdb
 
 ---
 
-### Task 0.2 — Decide: which memory backend for v1 scenarios?
+### Task 0.2 — Memory backend for v1 (DECIDED)
 
-Open DESIGN_DOC.md → **§7.6** (SBMP scenario YAML example).  
-Look at the `memory.backend` field. It uses `redis_episodic`.
-
-**Decision rule:**
-
-| If v1 scenarios only use `redis_episodic` or `in_context` | → Skip Qdrant for now. Do Phase 4 last. |
-| If any scenario YAML has `qdrant_vector` | → You need Qdrant. Do Phase 4 in parallel with Phase 3. |
-
-**Write your decision here before continuing:**
-
+**Decision:**
 ```
-v1 memory backend: _______________
-Qdrant needed in v1: YES / NO
+v1 memory backend: redis_episodic + in_context
+Qdrant needed in v1: NO
 ```
+
+**Why:** The benchmark contribution is the persistence evaluation methodology, not vector DB engineering.  
+`redis_episodic` and `in_context` give deterministic replay, faster implementation, and lower operational complexity — all critical for benchmark reproducibility.  
+Qdrant (and pgvector, Weaviate, Pinecone) are comparative backends for v2 experiments.
+
+**Design ref:** DESIGN_DOC.md §7.6 (scenario YAML, `memory.backend` field)
 
 ---
 
-### Task 0.3 — Decide: embedding model for Qdrant (if needed)
+### Task 0.3 — Embedding model (DECIDED for v2)
 
-Skip this task if Task 0.2 = NO.
+Skip implementation now. Record the decision for when v2 Qdrant work begins:
 
-| Option | Vector size | Cost | Requires API key |
-|---|---|---|---|
-| `text-embedding-3-small` (OpenAI) | 1536-d | API cost per token | Yes |
-| `all-MiniLM-L6-v2` (sentence-transformers) | 384-d | Free, runs locally | No |
-
-Pick one. Write it here:
 ```
-Embedding model: _______________
-Vector dimension: _______________
+Embedding model: all-MiniLM-L6-v2  (sentence-transformers, runs locally)
+Vector dimension: 384
 ```
 
-This affects the Qdrant collection schema in Phase 4.
+**Why:** Reproducibility. No API cost. Reviewers can reproduce experiments without OpenAI keys.  
+OpenAI `text-embedding-3-small` (1536-d) reserved for supplemental / production-realism experiments only.
 
 ---
 
@@ -91,8 +104,15 @@ Everything else depends on this phase being complete.
 
 **Do:** Create this file at `persistbench/db/schema.sql`
 
+The schema has two sections. The 8 **Core** tables are required for v1 experiments to run.  
+The 9 **Optional** tables are in the schema for future completeness — do not implement writers for them yet.
+
 ```sql
 -- persistbench/db/schema.sql
+
+-- ═══════════════════════════════════════════════════════════════
+-- CORE TABLES (v1 — required for experiments to run)
+-- ═══════════════════════════════════════════════════════════════
 
 -- ── RUNS ──────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS runs (
@@ -124,17 +144,8 @@ CREATE TABLE IF NOT EXISTS scenarios (
     PRIMARY KEY (scenario_id, benchmark_ver)
 );
 
-CREATE TABLE IF NOT EXISTS run_scenarios (
-    run_id          TEXT NOT NULL REFERENCES runs(run_id),
-    scenario_id     TEXT NOT NULL,
-    status          TEXT NOT NULL DEFAULT 'pending',
-    started_at      TIMESTAMPTZ,
-    finished_at     TIMESTAMPTZ,
-    PRIMARY KEY (run_id, scenario_id)
-);
-
 -- ── SESSIONS AND TURNS ────────────────────────────────────────
--- Design ref: §32.2, §35.3
+-- Design ref: §32.2 (session orchestration), §35.3 (replay engine)
 CREATE TABLE IF NOT EXISTS sessions (
     run_id              TEXT NOT NULL,
     scenario_id         TEXT NOT NULL,
@@ -144,9 +155,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     is_probe_session    BOOLEAN NOT NULL DEFAULT FALSE,
     turn_count          INTEGER,
     memory_entry_count  INTEGER,
-    memory_risk_score   DOUBLE,         -- computed by OGF (§29.3)
-    bdi_value           DOUBLE,         -- BDI checkpoint (§24.4)
-    safety_score        DOUBLE,         -- probe safety score (§24.5)
+    memory_risk_score   DOUBLE,         -- §29.3
+    bdi_value           DOUBLE,         -- §24.4 — computed per probe session
+    safety_score        DOUBLE,         -- §24.5
     started_at          TIMESTAMPTZ,
     finished_at         TIMESTAMPTZ,
     PRIMARY KEY (run_id, scenario_id, session_id)
@@ -161,7 +172,7 @@ CREATE TABLE IF NOT EXISTS turns (
     is_benign           BOOLEAN,
     is_trigger          BOOLEAN DEFAULT FALSE,
     is_probe            BOOLEAN DEFAULT FALSE,
-    fragment_id         TEXT,           -- e.g. f1, f2 — null if benign
+    fragment_id         TEXT,           -- null if benign turn
     content_hash        TEXT NOT NULL,
     agent_response_hash TEXT,
     tool_calls_count    INTEGER DEFAULT 0,
@@ -191,37 +202,9 @@ CREATE TABLE IF NOT EXISTS memory_entries (
     PRIMARY KEY (run_id, scenario_id, entry_id)
 );
 
--- Point-in-time snapshots for trust evolution charts (§37.3 V5)
-CREATE TABLE IF NOT EXISTS memory_entry_snapshots (
-    run_id          TEXT NOT NULL,
-    scenario_id     TEXT NOT NULL,
-    entry_id        TEXT NOT NULL,
-    session_id      INTEGER NOT NULL,
-    confidence      DOUBLE NOT NULL,
-    trust_score     DOUBLE NOT NULL,
-    toxicity_score  DOUBLE NOT NULL,
-    lifecycle_stage TEXT NOT NULL,
-    PRIMARY KEY (run_id, scenario_id, entry_id, session_id)
-);
-
-CREATE TABLE IF NOT EXISTS memory_conflicts (
-    conflict_id     TEXT PRIMARY KEY,
-    run_id          TEXT NOT NULL,
-    scenario_id     TEXT NOT NULL,
-    session_id      INTEGER NOT NULL,
-    entry_id_a      TEXT NOT NULL,
-    entry_id_b      TEXT NOT NULL,
-    winner_entry_id TEXT NOT NULL,
-    resolution_method TEXT,
-    trust_a         DOUBLE,
-    trust_b         DOUBLE,
-    benign_entry_id TEXT,
-    cra_correct     BOOLEAN         -- TRUE if benign entry won (§25.7)
-);
-
 -- ── PROVENANCE ────────────────────────────────────────────────
 -- Design ref: §26.2 (ProvenanceEvent dataclass)
--- This table is append-only. Never UPDATE or DELETE rows here.
+-- APPEND-ONLY. Never UPDATE or DELETE rows here.
 CREATE TABLE IF NOT EXISTS provenance_events (
     event_id            TEXT PRIMARY KEY,
     run_id              TEXT NOT NULL,
@@ -243,28 +226,8 @@ CREATE TABLE IF NOT EXISTS provenance_events (
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Consolidation lineage (child derived from parents)
-CREATE TABLE IF NOT EXISTS provenance_lineage (
-    run_id          TEXT NOT NULL,
-    scenario_id     TEXT NOT NULL,
-    child_entry_id  TEXT NOT NULL,
-    parent_entry_id TEXT NOT NULL,
-    PRIMARY KEY (run_id, scenario_id, child_entry_id, parent_entry_id)
-);
-
-CREATE TABLE IF NOT EXISTS deletion_records (
-    run_id                  TEXT NOT NULL,
-    scenario_id             TEXT NOT NULL,
-    entry_id                TEXT NOT NULL,
-    deletion_event_id       TEXT NOT NULL,
-    deletion_level          TEXT NOT NULL,  -- soft | hard | verified | forensic
-    verification_status     TEXT NOT NULL,  -- verified | partial | failed | pending
-    deletion_certificate_hash TEXT,
-    PRIMARY KEY (run_id, scenario_id, entry_id)
-);
-
 -- ── METRICS ───────────────────────────────────────────────────
--- Design ref: §10 (APS/RLS/UPS), §25 (10 extended CEP metrics)
+-- Design ref: §10 (APS/RLS/UPS), §25 (extended CEP metrics)
 CREATE TABLE IF NOT EXISTS scenario_metrics (
     run_id          TEXT NOT NULL,
     scenario_id     TEXT NOT NULL,
@@ -293,21 +256,8 @@ CREATE TABLE IF NOT EXISTS scenario_metrics (
     PRIMARY KEY (run_id, scenario_id)
 );
 
-CREATE TABLE IF NOT EXISTS suite_metrics (
-    run_id          TEXT NOT NULL,
-    suite           TEXT NOT NULL,
-    aps_mean        DOUBLE,
-    aps_std         DOUBLE,
-    rls_mean        DOUBLE,
-    rls_std         DOUBLE,
-    ups             DOUBLE,
-    composite_score DOUBLE,
-    scenario_count  INTEGER,
-    PRIMARY KEY (run_id, suite)
-);
-
--- ── DEFENSE AND GOVERNANCE EVENTS ────────────────────────────
--- Design ref: §6.4 (DefenseFlag), §29.5 (governance action table)
+-- ── DEFENSE FLAGS ─────────────────────────────────────────────
+-- Design ref: §6.4 (DefenseFlag)
 CREATE TABLE IF NOT EXISTS defense_flags (
     flag_id         TEXT PRIMARY KEY,
     run_id          TEXT NOT NULL,
@@ -323,6 +273,85 @@ CREATE TABLE IF NOT EXISTS defense_flags (
     flagged_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ═══════════════════════════════════════════════════════════════
+-- OPTIONAL TABLES (v2 — schema defined now, implement writers later)
+-- ═══════════════════════════════════════════════════════════════
+
+-- run tracking (supports parallel execution scheduling)
+CREATE TABLE IF NOT EXISTS run_scenarios (
+    run_id          TEXT NOT NULL REFERENCES runs(run_id),
+    scenario_id     TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'pending',
+    started_at      TIMESTAMPTZ,
+    finished_at     TIMESTAMPTZ,
+    PRIMARY KEY (run_id, scenario_id)
+);
+
+-- point-in-time snapshots for trust evolution charts (§37.3 V5)
+CREATE TABLE IF NOT EXISTS memory_entry_snapshots (
+    run_id          TEXT NOT NULL,
+    scenario_id     TEXT NOT NULL,
+    entry_id        TEXT NOT NULL,
+    session_id      INTEGER NOT NULL,
+    confidence      DOUBLE NOT NULL,
+    trust_score     DOUBLE NOT NULL,
+    toxicity_score  DOUBLE NOT NULL,
+    lifecycle_stage TEXT NOT NULL,
+    PRIMARY KEY (run_id, scenario_id, entry_id, session_id)
+);
+
+-- adversarial vs benign conflict resolution records (§25.7 CRA)
+CREATE TABLE IF NOT EXISTS memory_conflicts (
+    conflict_id     TEXT PRIMARY KEY,
+    run_id          TEXT NOT NULL,
+    scenario_id     TEXT NOT NULL,
+    session_id      INTEGER NOT NULL,
+    entry_id_a      TEXT NOT NULL,
+    entry_id_b      TEXT NOT NULL,
+    winner_entry_id TEXT NOT NULL,
+    resolution_method TEXT,
+    trust_a         DOUBLE,
+    trust_b         DOUBLE,
+    benign_entry_id TEXT,
+    cra_correct     BOOLEAN         -- TRUE if benign entry won
+);
+
+-- consolidation lineage DAG (§26.3)
+CREATE TABLE IF NOT EXISTS provenance_lineage (
+    run_id          TEXT NOT NULL,
+    scenario_id     TEXT NOT NULL,
+    child_entry_id  TEXT NOT NULL,
+    parent_entry_id TEXT NOT NULL,
+    PRIMARY KEY (run_id, scenario_id, child_entry_id, parent_entry_id)
+);
+
+-- soft/hard/verified/forensic deletion certificates (§27.2)
+CREATE TABLE IF NOT EXISTS deletion_records (
+    run_id                  TEXT NOT NULL,
+    scenario_id             TEXT NOT NULL,
+    entry_id                TEXT NOT NULL,
+    deletion_event_id       TEXT NOT NULL,
+    deletion_level          TEXT NOT NULL,  -- soft | hard | verified | forensic
+    verification_status     TEXT NOT NULL,  -- verified | partial | failed | pending
+    deletion_certificate_hash TEXT,
+    PRIMARY KEY (run_id, scenario_id, entry_id)
+);
+
+-- per-suite aggregation for leaderboard (§10.5, §36.5)
+CREATE TABLE IF NOT EXISTS suite_metrics (
+    run_id          TEXT NOT NULL,
+    suite           TEXT NOT NULL,
+    aps_mean        DOUBLE,
+    aps_std         DOUBLE,
+    rls_mean        DOUBLE,
+    rls_std         DOUBLE,
+    ups             DOUBLE,
+    composite_score DOUBLE,
+    scenario_count  INTEGER,
+    PRIMARY KEY (run_id, suite)
+);
+
+-- governance actions triggered by OGF (§29.5)
 CREATE TABLE IF NOT EXISTS governance_actions (
     action_id       TEXT PRIMARY KEY,
     run_id          TEXT NOT NULL,
@@ -337,8 +366,10 @@ CREATE TABLE IF NOT EXISTS governance_actions (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ── BEHAVIORAL PROBES ─────────────────────────────────────────
--- Design ref: §24.4 (BDI source data), §24.5 (safety score)
+-- per-probe raw records for BDI computation (§24.4)
+-- NOTE: BDI is also stored as a scalar in sessions.bdi_value.
+-- This table is for v2 when you need per-probe audit trails.
+-- See BDI methodology note in Task 2.9 before implementing.
 CREATE TABLE IF NOT EXISTS behavioral_probes (
     run_id          TEXT NOT NULL,
     scenario_id     TEXT NOT NULL,
@@ -352,8 +383,7 @@ CREATE TABLE IF NOT EXISTS behavioral_probes (
     PRIMARY KEY (run_id, scenario_id, session_id, probe_id)
 );
 
--- ── FORGETTING VALIDATION ─────────────────────────────────────
--- Design ref: §27.4 (FVS-1 through FVS-15)
+-- FVS-1 through FVS-15 forgetting validation results (§27.4)
 CREATE TABLE IF NOT EXISTS forgetting_validation (
     run_id          TEXT NOT NULL,
     scenario_id     TEXT NOT NULL,
@@ -367,16 +397,13 @@ CREATE TABLE IF NOT EXISTS forgetting_validation (
     PRIMARY KEY (run_id, scenario_id, entry_id, fvs_test_id)
 );
 
--- ── INDEXES ───────────────────────────────────────────────────
+-- ── INDEXES (cover core tables only) ──────────────────────────
 CREATE INDEX IF NOT EXISTS idx_sessions_run     ON sessions(run_id, scenario_id);
 CREATE INDEX IF NOT EXISTS idx_turns_session    ON turns(run_id, scenario_id, session_id);
 CREATE INDEX IF NOT EXISTS idx_mem_entries_run  ON memory_entries(run_id, scenario_id);
-CREATE INDEX IF NOT EXISTS idx_mem_snapshots    ON memory_entry_snapshots(run_id, entry_id);
 CREATE INDEX IF NOT EXISTS idx_prov_events_entry ON provenance_events(run_id, entry_id);
 CREATE INDEX IF NOT EXISTS idx_prov_events_sess  ON provenance_events(run_id, scenario_id, session_id);
 CREATE INDEX IF NOT EXISTS idx_flags_run        ON defense_flags(run_id, scenario_id);
-CREATE INDEX IF NOT EXISTS idx_probes_session   ON behavioral_probes(run_id, scenario_id, session_id);
-CREATE INDEX IF NOT EXISTS idx_fvs_entry        ON forgetting_validation(run_id, entry_id);
 CREATE INDEX IF NOT EXISTS idx_metrics_composite ON scenario_metrics(run_id, composite_score DESC);
 ```
 
@@ -386,11 +413,15 @@ import duckdb
 conn = duckdb.connect(":memory:")
 conn.execute(open("persistbench/db/schema.sql").read())
 tables = conn.execute("SHOW TABLES").fetchall()
-assert len(tables) == 16, f"Expected 16 tables, got {len(tables)}: {tables}"
-print("Schema OK:", [t[0] for t in tables])
+names = [t[0] for t in tables]
+# 8 core tables must be present
+core = {"runs", "scenarios", "sessions", "turns",
+        "memory_entries", "provenance_events", "scenario_metrics", "defense_flags"}
+assert core.issubset(set(names)), f"Missing core tables: {core - set(names)}"
+print(f"Schema OK: {len(tables)} tables ({len(core)} core + {len(tables)-len(core)} optional)")
 ```
 
-**Design ref:** §22.2 (memory tables), §26.2 (provenance tables), §10 + §25 (metrics tables)
+**Design ref:** §22.2 (memory tables), §26.2 (provenance), §10 + §25 (metrics)
 
 ---
 
@@ -409,8 +440,8 @@ _DEFAULT_DB = Path("persistbench.duckdb")
 
 def get_connection(db_path: Path = _DEFAULT_DB) -> duckdb.DuckDBPyConnection:
     """Return a DuckDB connection with the schema applied.
-    
-    Safe to call multiple times — schema uses CREATE IF NOT EXISTS throughout.
+
+    Safe to call multiple times — all tables use CREATE IF NOT EXISTS.
     Pass db_path=':memory:' for tests.
     """
     conn = duckdb.connect(str(db_path))
@@ -422,9 +453,11 @@ def get_connection(db_path: Path = _DEFAULT_DB) -> duckdb.DuckDBPyConnection:
 ```python
 from persistbench.db.init import get_connection
 conn = get_connection(":memory:")
-result = conn.execute("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'main'").fetchone()
-assert result[0] == 16
-print("Connection helper OK")
+tables = conn.execute("SHOW TABLES").fetchall()
+core = {"runs", "scenarios", "sessions", "turns",
+        "memory_entries", "provenance_events", "scenario_metrics", "defense_flags"}
+assert core.issubset({t[0] for t in tables})
+print(f"Connection helper OK — {len(tables)} tables loaded")
 ```
 
 ---
@@ -433,6 +466,9 @@ print("Connection helper OK")
 
 One function per table. All live in `persistbench/db/writers.py`.  
 Each function takes a connection as its first argument — no global state.
+
+**v1 scope:** implement writers for the 8 core tables only.  
+Writers for optional tables are tagged **(v2)** — stub them out or skip entirely.
 
 Create the file now with just the imports, then add functions one task at a time:
 
@@ -478,7 +514,7 @@ assert row[0] == "test-001"
 
 ---
 
-### Task 2.2 — write_scenario() and write_run_scenario()
+### Task 2.2 — write_scenario()
 
 **Do:** Add to `writers.py`
 
@@ -495,30 +531,9 @@ def write_scenario(conn: duckdb.DuckDBPyConnection, *,
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, [scenario_id, suite, variant, domain, difficulty,
           session_count, fragment_count, attack_class, benchmark_ver])
-
-
-def write_run_scenario(conn: duckdb.DuckDBPyConnection, *,
-                       run_id: str, scenario_id: str,
-                       status: str = "pending") -> None:
-    conn.execute("""
-        INSERT INTO run_scenarios (run_id, scenario_id, status)
-        VALUES (?, ?, ?)
-    """, [run_id, scenario_id, status])
-
-
-def update_run_scenario_status(conn: duckdb.DuckDBPyConnection, *,
-                                run_id: str, scenario_id: str,
-                                status: str) -> None:
-    ts = datetime.now(timezone.utc)
-    if status == "running":
-        conn.execute("""UPDATE run_scenarios SET status=?, started_at=?
-                        WHERE run_id=? AND scenario_id=?""",
-                     [status, ts, run_id, scenario_id])
-    else:
-        conn.execute("""UPDATE run_scenarios SET status=?, finished_at=?
-                        WHERE run_id=? AND scenario_id=?""",
-                     [status, ts, run_id, scenario_id])
 ```
+
+`write_run_scenario` / `update_run_scenario_status` are **(v2)** — they use the optional `run_scenarios` table.
 
 **Verify:**
 ```python
@@ -526,9 +541,8 @@ write_scenario(conn, scenario_id="sbmp-001", suite="SBMP",
                variant="direct_accumulation", domain="software_development",
                difficulty="medium", session_count=10,
                attack_class="SBMP", benchmark_ver="1.0.0", fragment_count=3)
-write_run_scenario(conn, run_id="test-001", scenario_id="sbmp-001")
-row = conn.execute("SELECT status FROM run_scenarios WHERE run_id='test-001'").fetchone()
-assert row[0] == "pending"
+row = conn.execute("SELECT scenario_id FROM scenarios WHERE scenario_id='sbmp-001'").fetchone()
+assert row[0] == "sbmp-001"
 ```
 
 ---
@@ -608,7 +622,7 @@ assert row[0] == "f1"
 
 ---
 
-### Task 2.5 — write_memory_entry() and write_memory_entry_snapshot()
+### Task 2.5 — write_memory_entry()
 
 **Do:** Add to `writers.py`
 
@@ -634,22 +648,10 @@ def write_memory_entry(conn: duckdb.DuckDBPyConnection, *,
           content_hash, lifecycle_stage, confidence, trust_score,
           toxicity_score, reinforcement_count, mutation_count,
           is_adversarial, adversarial_fragment_id, created_session])
-
-
-def write_memory_entry_snapshot(conn: duckdb.DuckDBPyConnection, *,
-                                 run_id: str, scenario_id: str,
-                                 entry_id: str, session_id: int,
-                                 confidence: float, trust_score: float,
-                                 toxicity_score: float,
-                                 lifecycle_stage: str) -> None:
-    conn.execute("""
-        INSERT OR IGNORE INTO memory_entry_snapshots
-        (run_id, scenario_id, entry_id, session_id,
-         confidence, trust_score, toxicity_score, lifecycle_stage)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, [run_id, scenario_id, entry_id, session_id,
-          confidence, trust_score, toxicity_score, lifecycle_stage])
 ```
+
+`write_memory_entry_snapshot` is **(v2)** — it stores per-session snapshots for trust evolution charts.  
+For v1, BDI and trust score are captured at the session level via `sessions.bdi_value` and `sessions.safety_score`.
 
 **Verify:**
 ```python
@@ -658,15 +660,11 @@ write_memory_entry(conn, run_id="test-001", scenario_id="sbmp-001",
                    content_hash="sha256:def", lifecycle_stage="created",
                    confidence=0.72, trust_score=0.80, toxicity_score=0.04,
                    adversarial_fragment_id="f1")
-write_memory_entry_snapshot(conn, run_id="test-001", scenario_id="sbmp-001",
-                             entry_id="mem-001", session_id=1,
-                             confidence=0.72, trust_score=0.80,
-                             toxicity_score=0.04, lifecycle_stage="created")
 row = conn.execute("SELECT trust_score FROM memory_entries WHERE entry_id='mem-001'").fetchone()
 assert row[0] == 0.80
 ```
 
-**Design ref:** §22.2 — each field maps to a lifecycle stage property
+**Design ref:** §22.2 — lifecycle stage enumeration
 
 ---
 
@@ -734,7 +732,6 @@ write_provenance_event(conn, event_id="evt-001", run_id="test-001",
 row = conn.execute("SELECT chain_hash FROM provenance_events WHERE event_id='evt-001'").fetchone()
 assert row[0].startswith("sha256:")
 
-# Write a second event and confirm chain links
 write_provenance_event(conn, event_id="evt-002", run_id="test-001",
                         scenario_id="sbmp-001", session_id=3,
                         agent_id="agent-a", entry_id="mem-001",
@@ -750,71 +747,11 @@ print("Provenance chain OK")
 
 ---
 
-### Task 2.7 — write_provenance_lineage() and write_deletion_record()
+### Task 2.7 — write_defense_flag()
 
 **Do:** Add to `writers.py`
 
 ```python
-def write_provenance_lineage(conn: duckdb.DuckDBPyConnection, *,
-                              run_id: str, scenario_id: str,
-                              child_entry_id: str,
-                              parent_entry_id: str) -> None:
-    conn.execute("""
-        INSERT OR IGNORE INTO provenance_lineage
-        (run_id, scenario_id, child_entry_id, parent_entry_id)
-        VALUES (?, ?, ?, ?)
-    """, [run_id, scenario_id, child_entry_id, parent_entry_id])
-
-
-def write_deletion_record(conn: duckdb.DuckDBPyConnection, *,
-                           run_id: str, scenario_id: str, entry_id: str,
-                           deletion_event_id: str, deletion_level: str,
-                           verification_status: str,
-                           deletion_certificate_hash: str = None) -> None:
-    conn.execute("""
-        INSERT OR REPLACE INTO deletion_records
-        (run_id, scenario_id, entry_id, deletion_event_id,
-         deletion_level, verification_status, deletion_certificate_hash)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, [run_id, scenario_id, entry_id, deletion_event_id,
-          deletion_level, verification_status, deletion_certificate_hash])
-```
-
-**Verify:**
-```python
-write_provenance_lineage(conn, run_id="test-001", scenario_id="sbmp-001",
-                          child_entry_id="mem-003", parent_entry_id="mem-001")
-write_provenance_lineage(conn, run_id="test-001", scenario_id="sbmp-001",
-                          child_entry_id="mem-003", parent_entry_id="mem-002")
-rows = conn.execute("SELECT parent_entry_id FROM provenance_lineage WHERE child_entry_id='mem-003'").fetchall()
-assert len(rows) == 2
-```
-
----
-
-### Task 2.8 — write_memory_conflict() and write_defense_flag()
-
-**Do:** Add to `writers.py`
-
-```python
-def write_memory_conflict(conn: duckdb.DuckDBPyConnection, *,
-                           conflict_id: str, run_id: str, scenario_id: str,
-                           session_id: int, entry_id_a: str, entry_id_b: str,
-                           winner_entry_id: str, resolution_method: str,
-                           trust_a: float, trust_b: float,
-                           benign_entry_id: str = None) -> None:
-    cra_correct = (winner_entry_id == benign_entry_id) if benign_entry_id else None
-    conn.execute("""
-        INSERT INTO memory_conflicts
-        (conflict_id, run_id, scenario_id, session_id,
-         entry_id_a, entry_id_b, winner_entry_id, resolution_method,
-         trust_a, trust_b, benign_entry_id, cra_correct)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, [conflict_id, run_id, scenario_id, session_id,
-          entry_id_a, entry_id_b, winner_entry_id, resolution_method,
-          trust_a, trust_b, benign_entry_id, cra_correct])
-
-
 def write_defense_flag(conn: duckdb.DuckDBPyConnection, *,
                         flag_id: str, run_id: str, scenario_id: str,
                         session_id: int, threat_class: str,
@@ -835,76 +772,23 @@ def write_defense_flag(conn: duckdb.DuckDBPyConnection, *,
 
 **Verify:**
 ```python
-write_memory_conflict(conn, conflict_id="con-001", run_id="test-001",
-                       scenario_id="sbmp-001", session_id=5,
-                       entry_id_a="mem-001", entry_id_b="mem-002",
-                       winner_entry_id="mem-002", resolution_method="trust_score",
-                       trust_a=0.31, trust_b=0.94, benign_entry_id="mem-002")
-row = conn.execute("SELECT cra_correct FROM memory_conflicts WHERE conflict_id='con-001'").fetchone()
-assert row[0] == True, "Benign entry won — CRA should be True"
+write_defense_flag(conn, flag_id="flag-001", run_id="test-001",
+                   scenario_id="sbmp-001", session_id=3,
+                   threat_class="SBMP", confidence=0.88,
+                   action="quarantine", is_true_positive=True)
+row = conn.execute("SELECT is_true_positive FROM defense_flags WHERE flag_id='flag-001'").fetchone()
+assert row[0] == True
 ```
+
+**Design ref:** §6.4 (DefenseFlag)
 
 ---
 
-### Task 2.9 — write_governance_action() and write_behavioral_probe()
+### Task 2.8 — write_scenario_metrics() and write_suite_metrics()
 
 **Do:** Add to `writers.py`
 
 ```python
-def write_governance_action(conn: duckdb.DuckDBPyConnection, *,
-                             action_id: str, run_id: str, scenario_id: str,
-                             session_id: int, action_type: str,
-                             triggered_by: str, mrs_at_trigger: float = None,
-                             entry_id: str = None,
-                             rollback_target_session: int = None) -> None:
-    conn.execute("""
-        INSERT INTO governance_actions
-        (action_id, run_id, scenario_id, session_id, action_type,
-         triggered_by, mrs_at_trigger, entry_id, rollback_target_session)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, [action_id, run_id, scenario_id, session_id, action_type,
-          triggered_by, mrs_at_trigger, entry_id, rollback_target_session])
-
-
-def write_behavioral_probe(conn: duckdb.DuckDBPyConnection, *,
-                            run_id: str, scenario_id: str, session_id: int,
-                            probe_id: str, probe_domain: str, probe_type: str,
-                            response_hash: str, action_taken: str = None,
-                            safety_passed: bool = None) -> None:
-    conn.execute("""
-        INSERT OR IGNORE INTO behavioral_probes
-        (run_id, scenario_id, session_id, probe_id, probe_domain,
-         probe_type, response_hash, action_taken, safety_passed)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, [run_id, scenario_id, session_id, probe_id, probe_domain,
-          probe_type, response_hash, action_taken, safety_passed])
-```
-
----
-
-### Task 2.10 — write_forgetting_validation() and write_scenario_metrics()
-
-**Do:** Add to `writers.py`
-
-```python
-def write_forgetting_validation(conn: duckdb.DuckDBPyConnection, *,
-                                 run_id: str, scenario_id: str,
-                                 entry_id: str, fvs_test_id: str,
-                                 sessions_after_deletion: int,
-                                 passed: bool,
-                                 resurfaced_content_hash: str = None,
-                                 resurfacing_pathway: str = None) -> None:
-    conn.execute("""
-        INSERT OR REPLACE INTO forgetting_validation
-        (run_id, scenario_id, entry_id, fvs_test_id,
-         sessions_after_deletion, passed,
-         resurfaced_content_hash, resurfacing_pathway)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, [run_id, scenario_id, entry_id, fvs_test_id,
-          sessions_after_deletion, passed,
-          resurfaced_content_hash, resurfacing_pathway])
-
-
 def write_scenario_metrics(conn: duckdb.DuckDBPyConnection, *,
                             run_id: str, scenario_id: str,
                             aps: float = None, rls: float = None,
@@ -953,23 +837,79 @@ def write_suite_metrics(conn: duckdb.DuckDBPyConnection, *,
           ups, composite_score, scenario_count])
 ```
 
+**Verify:**
+```python
+write_scenario_metrics(conn, run_id="test-001", scenario_id="sbmp-001",
+                        aps=0.41, rls=0.35, ups=0.88,
+                        attack_detected=True, detection_session=3,
+                        flags_emitted=1, false_positives=0,
+                        composite_score=0.535)
+row = conn.execute("SELECT composite_score FROM scenario_metrics WHERE run_id='test-001'").fetchone()
+assert abs(row[0] - 0.535) < 1e-9
+```
+
+**Design ref:** §10 (composite score formula: α=0.45·APS + β=0.35·RLS + γ=0.20·UPS)
+
+---
+
+### Tasks 2.9 + 2.10 — v2 writers (define but defer)
+
+The following writers are for optional tables. Define them as stubs for now.
+
+**BDI methodology note (read before implementing `write_behavioral_probe`):**  
+The Behavioral Drift Index risks being seen as a subjective metric if probe methodology is not locked down.  
+Before implementing the `behavioral_probes` table writer, define:
+- A fixed probe set per domain (≥10 probes, identical across all runs)
+- Scoring method: either cosine similarity of response embeddings vs. session-1 baseline, or a rubric classifier
+- Pass/fail threshold (e.g. cosine similarity < 0.85 = drift detected)
+- Store probe IDs in a static YAML file under `persistbench/probes/`
+
+Without this, reviewers will call BDI subjective. See DESIGN_DOC.md §24.4.
+
+```python
+# v2 — implement after behavioral_probes probe set is locked
+def write_behavioral_probe(*args, **kwargs):
+    raise NotImplementedError("behavioral_probes is a v2 table — define probe set first")
+
+# v2 — implement with Trustworthy Forgetting infrastructure (§27)
+def write_forgetting_validation(*args, **kwargs):
+    raise NotImplementedError("forgetting_validation is a v2 table")
+
+# v2 — implement with provenance DAG visualization
+def write_provenance_lineage(*args, **kwargs):
+    raise NotImplementedError("provenance_lineage is a v2 table")
+
+def write_deletion_record(*args, **kwargs):
+    raise NotImplementedError("deletion_records is a v2 table")
+
+# v2 — implement with conflict resolution infrastructure
+def write_memory_conflict(*args, **kwargs):
+    raise NotImplementedError("memory_conflicts is a v2 table")
+
+# v2 — implement when run_scenarios parallelism is needed
+def write_run_scenario(*args, **kwargs):
+    raise NotImplementedError("run_scenarios is a v2 table")
+
+# v2 — implement with trust evolution chart infrastructure
+def write_memory_entry_snapshot(*args, **kwargs):
+    raise NotImplementedError("memory_entry_snapshots is a v2 table")
+
+# v2 — implement with governance/OGF infrastructure
+def write_governance_action(*args, **kwargs):
+    raise NotImplementedError("governance_actions is a v2 table")
+```
+
 **Verify (end of Phase 2):**
 ```python
-# Confirm all writer functions exist and are callable
 from persistbench.db import writers
-expected = [
-    "write_run", "write_scenario", "write_run_scenario",
-    "update_run_scenario_status", "write_session", "write_turn",
-    "write_memory_entry", "write_memory_entry_snapshot",
-    "write_provenance_event", "write_provenance_lineage",
-    "write_deletion_record", "write_memory_conflict",
-    "write_defense_flag", "write_governance_action",
-    "write_behavioral_probe", "write_forgetting_validation",
-    "write_scenario_metrics", "write_suite_metrics",
+v1_required = [
+    "write_run", "write_scenario", "write_session", "write_turn",
+    "write_memory_entry", "write_provenance_event", "get_last_chain_hash",
+    "write_defense_flag", "write_scenario_metrics", "write_suite_metrics",
 ]
-missing = [f for f in expected if not hasattr(writers, f)]
+missing = [f for f in v1_required if not hasattr(writers, f)]
 assert not missing, f"Missing: {missing}"
-print("All writers present")
+print("All v1 writers present")
 ```
 
 ---
@@ -991,6 +931,7 @@ import duckdb
 ### Task 3.1 — BDI time series
 
 Feeds dashboard view V2 and the LEE safety degradation chart.  
+`bdi_value` is stored as a scalar on the session row — no join needed.  
 Design ref: §24.4, §24.5, §37.3
 
 ```python
@@ -1008,10 +949,6 @@ def get_bdi_time_series(conn: duckdb.DuckDBPyConnection,
 
 **Verify:**
 ```python
-# Write two sessions then query
-write_session(conn, run_id="test-001", scenario_id="sbmp-001",
-              session_id=2, bdi_value=0.05, safety_score=0.95,
-              memory_risk_score=0.12)
 series = get_bdi_time_series(conn, "test-001", "sbmp-001")
 assert len(series) >= 1
 assert "bdi" in series[0]
@@ -1019,104 +956,94 @@ assert "bdi" in series[0]
 
 ---
 
-### Task 3.2 — Trust evolution for a single memory entry
+### Task 3.2 — APS / RLS per scenario (core metric query)
 
-Feeds dashboard view V5. Design ref: §37.3
-
-```python
-def get_trust_evolution(conn: duckdb.DuckDBPyConnection,
-                         run_id: str, scenario_id: str,
-                         entry_id: str) -> list[dict]:
-    rows = conn.execute("""
-        SELECT session_id, confidence, trust_score,
-               toxicity_score, lifecycle_stage
-        FROM memory_entry_snapshots
-        WHERE run_id = ? AND scenario_id = ? AND entry_id = ?
-        ORDER BY session_id
-    """, [run_id, scenario_id, entry_id]).fetchall()
-    return [{"session": r[0], "confidence": r[1], "trust": r[2],
-             "toxicity": r[3], "stage": r[4]} for r in rows]
-```
-
----
-
-### Task 3.3 — Conflict Resolution Accuracy (CRA)
-
-Design ref: §25.7
+Design ref: §10.3 (APS formula), §10.4 (RLS formula)
 
 ```python
-def get_cra(conn: duckdb.DuckDBPyConnection,
-             run_id: str, scenario_id: str) -> Optional[float]:
+def get_scenario_metrics(conn: duckdb.DuckDBPyConnection,
+                          run_id: str, scenario_id: str) -> Optional[dict]:
     row = conn.execute("""
-        SELECT AVG(cra_correct::INTEGER)
-        FROM memory_conflicts
+        SELECT aps, rls, ups, bdi_10, bdi_50, composite_score,
+               attack_detected, detection_session, recovery_session,
+               flags_emitted, false_positives
+        FROM scenario_metrics
         WHERE run_id = ? AND scenario_id = ?
-          AND benign_entry_id IS NOT NULL
     """, [run_id, scenario_id]).fetchone()
-    return row[0]
-```
-
----
-
-### Task 3.4 — Provenance chain (recursive CTE)
-
-Design ref: §26.3. Returns all ancestors of an entry in order.
-
-```python
-def get_provenance_chain(conn: duckdb.DuckDBPyConnection,
-                          run_id: str, scenario_id: str,
-                          entry_id: str) -> list[dict]:
-    rows = conn.execute("""
-        WITH RECURSIVE chain AS (
-            SELECT child_entry_id, parent_entry_id, 1 AS depth
-            FROM provenance_lineage
-            WHERE run_id = ? AND scenario_id = ? AND child_entry_id = ?
-
-            UNION ALL
-
-            SELECT pl.child_entry_id, pl.parent_entry_id, c.depth + 1
-            FROM provenance_lineage pl
-            JOIN chain c ON pl.child_entry_id = c.parent_entry_id
-            WHERE pl.run_id = ? AND pl.scenario_id = ?
-        )
-        SELECT child_entry_id, parent_entry_id, depth
-        FROM chain ORDER BY depth
-    """, [run_id, scenario_id, entry_id, run_id, scenario_id]).fetchall()
-    return [{"child": r[0], "parent": r[1], "depth": r[2]} for r in rows]
+    if row is None:
+        return None
+    cols = ["aps", "rls", "ups", "bdi_10", "bdi_50", "composite",
+            "attack_detected", "detection_session", "recovery_session",
+            "flags_emitted", "false_positives"]
+    return dict(zip(cols, row))
 ```
 
 **Verify:**
 ```python
-chain = get_provenance_chain(conn, "test-001", "sbmp-001", "mem-003")
-assert any(r["parent"] == "mem-001" for r in chain)
+m = get_scenario_metrics(conn, "test-001", "sbmp-001")
+assert m is not None
+assert abs(m["composite"] - 0.535) < 1e-9
 ```
 
 ---
 
-### Task 3.5 — FVS summary
+### Task 3.3 — Provenance event log for one entry
 
-Design ref: §27.5
+Design ref: §26.2 — ordered event list, chain hash audit trail
 
 ```python
-def get_fvs_summary(conn: duckdb.DuckDBPyConnection,
-                     run_id: str) -> list[dict]:
+def get_provenance_events(conn: duckdb.DuckDBPyConnection,
+                           run_id: str, scenario_id: str,
+                           entry_id: str) -> list[dict]:
     rows = conn.execute("""
-        SELECT fvs_test_id,
-               COUNT(*) FILTER (WHERE passed = FALSE) AS failures,
-               COUNT(*)                                AS total,
-               AVG(passed::INTEGER)                   AS pass_rate
-        FROM forgetting_validation
-        WHERE run_id = ?
-        GROUP BY fvs_test_id
-        ORDER BY fvs_test_id
-    """, [run_id]).fetchall()
-    return [{"test": r[0], "failures": r[1], "total": r[2],
-             "pass_rate": r[3]} for r in rows]
+        SELECT event_id, session_id, event_type,
+               confidence_before, confidence_after,
+               trust_before, trust_after,
+               toxicity_before, toxicity_after,
+               chain_hash, created_at
+        FROM provenance_events
+        WHERE run_id = ? AND scenario_id = ? AND entry_id = ?
+        ORDER BY created_at
+    """, [run_id, scenario_id, entry_id]).fetchall()
+    cols = ["event_id", "session", "event_type",
+            "conf_before", "conf_after", "trust_before", "trust_after",
+            "tox_before", "tox_after", "chain_hash", "created_at"]
+    return [dict(zip(cols, r)) for r in rows]
+```
+
+**Verify:**
+```python
+events = get_provenance_events(conn, "test-001", "sbmp-001", "mem-001")
+assert len(events) >= 1
+assert events[0]["chain_hash"].startswith("sha256:")
 ```
 
 ---
 
-### Task 3.6 — Cross-run leaderboard
+### Task 3.4 — Defense flag summary (true positive rate)
+
+Design ref: §6.4
+
+```python
+def get_defense_summary(conn: duckdb.DuckDBPyConnection,
+                          run_id: str, scenario_id: str) -> dict:
+    row = conn.execute("""
+        SELECT COUNT(*)                                         AS total,
+               COUNT(*) FILTER (WHERE is_true_positive = TRUE) AS true_positives,
+               COUNT(*) FILTER (WHERE is_true_positive = FALSE) AS false_positives,
+               AVG(confidence)                                  AS avg_confidence
+        FROM defense_flags
+        WHERE run_id = ? AND scenario_id = ?
+    """, [run_id, scenario_id]).fetchone()
+    total, tp, fp, avg_conf = row
+    tpr = (tp / total) if total else None
+    return {"total": total, "true_positives": tp, "false_positives": fp,
+            "tpr": tpr, "avg_confidence": avg_conf}
+```
+
+---
+
+### Task 3.5 — Cross-run leaderboard
 
 Design ref: §10.5, §36.5
 
@@ -1140,201 +1067,72 @@ def get_leaderboard(conn: duckdb.DuckDBPyConnection) -> list[dict]:
     return [dict(zip(cols, r)) for r in rows]
 ```
 
+**Verify:**
+```python
+conn.execute("UPDATE runs SET status='complete' WHERE run_id='test-001'")
+board = get_leaderboard(conn)
+assert board[0]["defense"] == "NoDefense"
+assert board[0]["composite"] == pytest.approx(0.535)
+```
+
+---
+
+### Task 3.6 — v2 query stubs
+
+```python
+# v2 — requires memory_entry_snapshots table (trust evolution chart)
+def get_trust_evolution(*args, **kwargs):
+    raise NotImplementedError("trust evolution requires memory_entry_snapshots (v2)")
+
+# v2 — requires memory_conflicts table
+def get_cra(*args, **kwargs):
+    raise NotImplementedError("CRA requires memory_conflicts (v2)")
+
+# v2 — requires provenance_lineage table (DAG traversal)
+def get_provenance_chain(*args, **kwargs):
+    raise NotImplementedError("provenance DAG requires provenance_lineage (v2)")
+
+# v2 — requires forgetting_validation table
+def get_fvs_summary(*args, **kwargs):
+    raise NotImplementedError("FVS requires forgetting_validation (v2)")
+```
+
 **Verify (end of Phase 3):**
 ```python
 from persistbench.db import queries
-expected = [
-    "get_bdi_time_series", "get_trust_evolution", "get_cra",
-    "get_provenance_chain", "get_fvs_summary", "get_leaderboard",
+v1_required = [
+    "get_bdi_time_series", "get_scenario_metrics",
+    "get_provenance_events", "get_defense_summary", "get_leaderboard",
 ]
-missing = [f for f in expected if not hasattr(queries, f)]
+missing = [f for f in v1_required if not hasattr(queries, f)]
 assert not missing, f"Missing: {missing}"
-print("All queries present")
+print("All v1 queries present")
 ```
 
 ---
 
-## Phase 4 — Qdrant (skip if Task 0.2 = NO)
+## Phase 4 — Qdrant (DEFERRED to v2)
 
----
+**Do not implement for v1.**
 
-### Task 4.1 — Start Qdrant locally
+Decision rationale (Task 0.2): v1 scenarios use `redis_episodic` and `in_context`.  
+Qdrant is a v2 comparative backend experiment, not a v1 requirement.
 
-**Do:**
+When v2 begins, add these backends in order:
+1. `all-MiniLM-L6-v2` embeddings (384-d, local, free) — no API key needed
+2. Qdrant collection per scenario-run
+3. pgvector for PostgreSQL users
+4. Weaviate, Pinecone for production-realism supplemental section
 
-```bash
-pip install qdrant-client
-docker pull qdrant/qdrant
-docker run -d --name qdrant -p 6333:6333 \
-  -v "$(pwd)/qdrant_data:/qdrant/storage" qdrant/qdrant
-```
-
-**Verify:**
-```bash
-curl http://localhost:6333/healthz
-# Expected: {"title":"qdrant - vector search engine","version":"..."}
-```
-
----
-
-### Task 4.2 — Write the Qdrant memory backend
-
-Create `persistbench/memory/backends/qdrant_vector.py`.  
-Use the vector dimension you decided in Task 0.3.
-
-```python
-# persistbench/memory/backends/qdrant_vector.py
-from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance, PointStruct
-from typing import Optional
-import uuid
-
-VECTOR_DIM = 1536   # change to 384 if using all-MiniLM-L6-v2
-
-
-def make_collection_name(scenario_id: str, run_id: str,
-                           archive: bool = False) -> str:
-    prefix = "archive" if archive else "agent_memory"
-    return f"{prefix}_{scenario_id}_{run_id}"
-
-
-def create_memory_collection(client: QdrantClient,
-                               scenario_id: str, run_id: str,
-                               archive: bool = False) -> str:
-    name = make_collection_name(scenario_id, run_id, archive)
-    client.recreate_collection(
-        collection_name=name,
-        vectors_config=VectorParams(size=VECTOR_DIM, distance=Distance.COSINE)
-    )
-    return name
-
-
-def upsert_entry(client: QdrantClient, collection: str, *,
-                  entry_id: str, vector: list[float],
-                  session_id: int, trust_score: float,
-                  toxicity_score: float, lifecycle_stage: str,
-                  content: str, provenance_hash: str,
-                  is_adversarial: Optional[bool] = None) -> None:
-    client.upsert(collection_name=collection, points=[
-        PointStruct(
-            id=str(uuid.uuid5(uuid.NAMESPACE_DNS, entry_id)),
-            vector=vector,
-            payload={
-                "entry_id": entry_id,
-                "session_id": session_id,
-                "trust_score": trust_score,
-                "toxicity_score": toxicity_score,
-                "lifecycle_stage": lifecycle_stage,
-                "content": content,
-                "provenance_hash": provenance_hash,
-                "is_adversarial": is_adversarial,
-            }
-        )
-    ])
-
-
-def search(client: QdrantClient, collection: str,
-            query_vector: list[float], top_k: int = 5) -> list[dict]:
-    hits = client.search(collection_name=collection,
-                          query_vector=query_vector, limit=top_k)
-    return [{"entry_id": h.payload["entry_id"],
-              "score": h.score,
-              "trust_score": h.payload["trust_score"],
-              "lifecycle_stage": h.payload["lifecycle_stage"]}
-             for h in hits]
-
-
-def drop_collection(client: QdrantClient,
-                     scenario_id: str, run_id: str,
-                     archive: bool = False) -> None:
-    name = make_collection_name(scenario_id, run_id, archive)
-    client.delete_collection(name)
-```
-
-**Verify:**
-```python
-from qdrant_client import QdrantClient
-from persistbench.memory.backends.qdrant_vector import (
-    create_memory_collection, upsert_entry, search, drop_collection
-)
-client = QdrantClient("localhost", port=6333)
-col = create_memory_collection(client, "sbmp-001", "test-001")
-upsert_entry(client, col, entry_id="mem-001",
-              vector=[0.1] * 1536,   # dummy vector
-              session_id=1, trust_score=0.80, toxicity_score=0.04,
-              lifecycle_stage="created", content="test",
-              provenance_hash="sha256:abc")
-results = search(client, col, query_vector=[0.1] * 1536, top_k=1)
-assert results[0]["entry_id"] == "mem-001"
-drop_collection(client, "sbmp-001", "test-001")
-print("Qdrant backend OK")
-```
-
----
-
-### Task 4.3 — Write the DuckDB-Qdrant bridge
-
-After a scenario run, flush all Qdrant payload data into DuckDB, then drop the collection.  
-This keeps DuckDB as the permanent record and Qdrant as the runtime working store.
-
-**Do:** Add to `persistbench/db/writers.py`
-
-```python
-def flush_qdrant_to_duckdb(conn: duckdb.DuckDBPyConnection,
-                             qdrant_client,
-                             scenario_id: str, run_id: str) -> int:
-    """Read all points from the Qdrant collection and bulk-insert into
-    memory_entries. Returns the number of entries written."""
-    from persistbench.memory.backends.qdrant_vector import make_collection_name
-    collection = make_collection_name(scenario_id, run_id)
-    
-    points, offset = [], None
-    while True:
-        batch, next_offset = qdrant_client.scroll(
-            collection_name=collection,
-            limit=100,
-            offset=offset,
-            with_payload=True,
-            with_vectors=False
-        )
-        points.extend(batch)
-        if next_offset is None:
-            break
-        offset = next_offset
-
-    for p in points:
-        pl = p.payload
-        write_memory_entry(
-            conn,
-            run_id=run_id,
-            scenario_id=scenario_id,
-            entry_id=pl["entry_id"],
-            created_session=pl["session_id"],
-            created_turn=0,             # enrich later from replay_trace
-            content_hash="qdrant_flush",
-            lifecycle_stage=pl["lifecycle_stage"],
-            confidence=0.0,             # enrich from provenance_events
-            trust_score=pl["trust_score"],
-            toxicity_score=pl["toxicity_score"],
-            is_adversarial=pl.get("is_adversarial"),
-        )
-    return len(points)
-```
-
-**Verify:**
-```python
-written = flush_qdrant_to_duckdb(conn, client, "sbmp-001", "test-001")
-assert written >= 0
-row = conn.execute("SELECT COUNT(*) FROM memory_entries WHERE run_id='test-001'").fetchone()
-print(f"Entries in DuckDB after flush: {row[0]}")
-```
+See Task 0.3 for the embedding model decision already recorded.  
+Design ref: DESIGN_DOC.md §7.6 (backend YAML spec)
 
 ---
 
 ## Phase 5 — Integration test
 
-Run this once all phases above are complete. It creates a minimal fake run  
-end-to-end and confirms every table has data and every query returns results.
+Run this once all Phase 1–3 tasks are complete. It seeds a minimal fake run  
+end-to-end and confirms the 8 core tables are populated and all v1 queries return correct results.
 
 **Do:** Create `tests/test_db_integration.py`
 
@@ -1362,7 +1160,6 @@ def seed_minimal_run(conn):
                             difficulty="medium", session_count=4,
                             attack_class="SBMP", benchmark_ver="1.0.0",
                             fragment_count=3)
-    writers.write_run_scenario(conn, run_id="run-001", scenario_id="sbmp-001")
 
     for sid in range(1, 5):
         writers.write_session(conn, run_id="run-001", scenario_id="sbmp-001",
@@ -1377,12 +1174,6 @@ def seed_minimal_run(conn):
                                 confidence=0.77, trust_score=0.83,
                                 toxicity_score=0.05,
                                 adversarial_fragment_id="f1")
-    for sid in range(1, 5):
-        writers.write_memory_entry_snapshot(
-            conn, run_id="run-001", scenario_id="sbmp-001",
-            entry_id="mem-001", session_id=sid,
-            confidence=0.70 + sid * 0.02, trust_score=0.80 + sid * 0.01,
-            toxicity_score=0.04, lifecycle_stage="reinforced")
 
     writers.write_provenance_event(conn, event_id="evt-001",
                                     run_id="run-001", scenario_id="sbmp-001",
@@ -1413,14 +1204,26 @@ def seed_minimal_run(conn):
 def test_full_integration(conn):
     seed_minimal_run(conn)
 
+    # BDI time series — 4 sessions seeded
     series = queries.get_bdi_time_series(conn, "run-001", "sbmp-001")
     assert len(series) == 4
+    assert series[0]["bdi"] == pytest.approx(0.01)
 
-    trust = queries.get_trust_evolution(conn, "run-001", "sbmp-001", "mem-001")
-    assert len(trust) == 4
+    # Provenance event log
+    events = queries.get_provenance_events(conn, "run-001", "sbmp-001", "mem-001")
+    assert len(events) == 1
+    assert events[0]["chain_hash"].startswith("sha256:")
 
-    board = queries.get_leaderboard(conn)
-    # leaderboard needs status = complete
+    # Defense summary
+    summary = queries.get_defense_summary(conn, "run-001", "sbmp-001")
+    assert summary["total"] == 1
+    assert summary["tpr"] == pytest.approx(1.0)
+
+    # Scenario metrics
+    m = queries.get_scenario_metrics(conn, "run-001", "sbmp-001")
+    assert m["composite"] == pytest.approx(0.535)
+
+    # Leaderboard requires status = complete
     conn.execute("UPDATE runs SET status='complete' WHERE run_id='run-001'")
     board = queries.get_leaderboard(conn)
     assert board[0]["defense"] == "NoDefense"
@@ -1440,30 +1243,27 @@ pytest tests/test_db_integration.py -v
 
 ## Progress tracker
 
-| Phase | Task | Done |
-|---|---|---|
-| 0 | 0.1 Confirm DuckDB version | ☐ |
-| 0 | 0.2 Decide memory backend | ☐ |
-| 0 | 0.3 Decide embedding model | ☐ |
-| 1 | 1.1 schema.sql | ☐ |
-| 1 | 1.2 init.py | ☐ |
-| 2 | 2.1 write_run | ☐ |
-| 2 | 2.2 write_scenario / write_run_scenario | ☐ |
-| 2 | 2.3 write_session | ☐ |
-| 2 | 2.4 write_turn | ☐ |
-| 2 | 2.5 write_memory_entry / snapshot | ☐ |
-| 2 | 2.6 write_provenance_event (chain hash) | ☐ |
-| 2 | 2.7 write_provenance_lineage / deletion_record | ☐ |
-| 2 | 2.8 write_memory_conflict / defense_flag | ☐ |
-| 2 | 2.9 write_governance_action / behavioral_probe | ☐ |
-| 2 | 2.10 write_forgetting_validation / metrics | ☐ |
-| 3 | 3.1 get_bdi_time_series | ☐ |
-| 3 | 3.2 get_trust_evolution | ☐ |
-| 3 | 3.3 get_cra | ☐ |
-| 3 | 3.4 get_provenance_chain | ☐ |
-| 3 | 3.5 get_fvs_summary | ☐ |
-| 3 | 3.6 get_leaderboard | ☐ |
-| 4 | 4.1 Start Qdrant (if needed) | ☐ |
-| 4 | 4.2 qdrant_vector.py backend | ☐ |
-| 4 | 4.3 flush_qdrant_to_duckdb bridge | ☐ |
-| 5 | Integration test | ☐ |
+| Phase | Task | Scope | Done |
+|---|---|---|---|
+| 0 | 0.1 Confirm DuckDB ≥ 0.10.0 | v1 | ☐ |
+| 0 | 0.2 Memory backend → redis_episodic + in_context | **DECIDED** | ✓ |
+| 0 | 0.3 Embedding model → all-MiniLM-L6-v2 384-d | **DECIDED (v2)** | ✓ |
+| 1 | 1.1 schema.sql (8 core + 9 optional tables) | v1 | ☐ |
+| 1 | 1.2 init.py connection helper | v1 | ☐ |
+| 2 | 2.1 write_run | v1 | ☐ |
+| 2 | 2.2 write_scenario | v1 | ☐ |
+| 2 | 2.3 write_session | v1 | ☐ |
+| 2 | 2.4 write_turn | v1 | ☐ |
+| 2 | 2.5 write_memory_entry | v1 | ☐ |
+| 2 | 2.6 write_provenance_event (chain hash) | v1 | ☐ |
+| 2 | 2.7 write_defense_flag | v1 | ☐ |
+| 2 | 2.8 write_scenario_metrics / write_suite_metrics | v1 | ☐ |
+| 2 | 2.9 v2 writer stubs (8 functions) | v2 | ☐ |
+| 3 | 3.1 get_bdi_time_series | v1 | ☐ |
+| 3 | 3.2 get_scenario_metrics | v1 | ☐ |
+| 3 | 3.3 get_provenance_events | v1 | ☐ |
+| 3 | 3.4 get_defense_summary | v1 | ☐ |
+| 3 | 3.5 get_leaderboard | v1 | ☐ |
+| 3 | 3.6 v2 query stubs (4 functions) | v2 | ☐ |
+| 4 | Qdrant backend (all tasks) | **DEFERRED v2** | — |
+| 5 | Integration test | v1 | ☐ |
