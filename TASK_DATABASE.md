@@ -1245,25 +1245,27 @@ pytest tests/test_db_integration.py -v
 
 | Phase | Task | Scope | Done |
 |---|---|---|---|
-| 0 | 0.1 Confirm DuckDB ≥ 0.10.0 | v1 | ☐ |
+| 0 | 0.1 Confirm DuckDB ≥ 0.10.0 | v1 | ✓ |
 | 0 | 0.2 Memory backend → redis_episodic + in_context | **DECIDED** | ✓ |
 | 0 | 0.3 Embedding model → all-MiniLM-L6-v2 384-d | **DECIDED (v2)** | ✓ |
-| 1 | 1.1 schema.sql (8 core + 9 optional tables) | v1 | ☐ |
-| 1 | 1.2 init.py connection helper | v1 | ☐ |
-| 2 | 2.1 write_run | v1 | ☐ |
-| 2 | 2.2 write_scenario | v1 | ☐ |
-| 2 | 2.3 write_session | v1 | ☐ |
-| 2 | 2.4 write_turn | v1 | ☐ |
-| 2 | 2.5 write_memory_entry | v1 | ☐ |
-| 2 | 2.6 write_provenance_event (chain hash) | v1 | ☐ |
-| 2 | 2.7 write_defense_flag | v1 | ☐ |
-| 2 | 2.8 write_scenario_metrics / write_suite_metrics | v1 | ☐ |
-| 2 | 2.9 v2 writer stubs (8 functions) | v2 | ☐ |
-| 3 | 3.1 get_bdi_time_series | v1 | ☐ |
-| 3 | 3.2 get_scenario_metrics | v1 | ☐ |
-| 3 | 3.3 get_provenance_events | v1 | ☐ |
-| 3 | 3.4 get_defense_summary | v1 | ☐ |
-| 3 | 3.5 get_leaderboard | v1 | ☐ |
-| 3 | 3.6 v2 query stubs (4 functions) | v2 | ☐ |
+| 1 | 1.1 schema.sql (8 core + 9 optional tables) | v1 | ✓ |
+| 1 | 1.2 init.py connection helper | v1 | ✓ |
+| 2 | 2.1 write_run | v1 | ✓ |
+| 2 | 2.2 write_scenario | v1 | ✓ |
+| 2 | 2.3 write_session | v1 | ✓ |
+| 2 | 2.4 write_turn | v1 | ✓ |
+| 2 | 2.5 write_memory_entry | v1 | ✓ |
+| 2 | 2.6 write_provenance_event (chain hash) | v1 | ✓ |
+| 2 | 2.7 write_defense_flag | v1 | ✓ |
+| 2 | 2.8 write_scenario_metrics / write_suite_metrics | v1 | ✓ |
+| 2 | 2.9 v2 writer stubs (8 functions) | v2 | ✓ |
+| 3 | 3.1 get_bdi_time_series | v1 | ✓ |
+| 3 | 3.2 get_scenario_metrics | v1 | ✓ |
+| 3 | 3.3 get_provenance_events | v1 | ✓ |
+| 3 | 3.4 get_defense_summary | v1 | ✓ |
+| 3 | 3.5 get_leaderboard | v1 | ✓ |
+| 3 | 3.6 v2 query stubs (4 functions) | v2 | ✓ |
 | 4 | Qdrant backend (all tasks) | **DEFERRED v2** | — |
-| 5 | Integration test | v1 | ☐ |
+| 5 | Integration test | v1 | ✓ |
+| G | Synthetic data generator (§32.6) | v1 | ✓ |
+| R | Replay engine | v1 | ✓ |
