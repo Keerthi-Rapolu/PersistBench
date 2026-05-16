@@ -1,0 +1,14 @@
+# Core dashboard dependencies (required for Streamlit Cloud)
+duckdb>=0.10.0
+streamlit>=1.35.0
+altair>=5.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+pyyaml>=6.0
+
+# Optional — only needed for running benchmarks (not the dashboard)
+# sentence-transformers>=2.2.0   # BDI_sem, embedding ghost detection
+# qdrant-client>=1.6.0           # Qdrant vector memory backend
+# anthropic>=0.25.0              # ClaudeBackend
+# openai>=1.0.0                  # OpenAIBackend
