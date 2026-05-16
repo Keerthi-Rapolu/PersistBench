@@ -157,52 +157,9 @@ The benchmark is designed for security researchers who need to evaluate memory-e
 
 ## Architecture
 
-```mermaid
-graph TD
-    subgraph Input
-        Y[Scenario YAML]
-        S[Seed / RNG]
-    end
-
-    subgraph TraceGeneration
-        G[SLIS Trace Generator]
-    end
-
-    subgraph ReplayEngine
-        R[ReplayEngine]
-        D[Defense Middleware\nPLS · MW · TOH · DEV · PS · CD]
-        B[Agent Backend\nEcho · Claude · OpenAI]
-        M[Memory Store\nDuckDB · Qdrant]
-    end
-
-    subgraph Evaluation
-        ME[Metrics Computation\nAPS · RLS · UPS · BDI · FVS · CRA]
-        FV[ForgettingValidator\nFVS-1 through FVS-15]
-        PR[Provenance DAG\nBFS Ancestor/Descendant]
-    end
-
-    subgraph Output
-        DB[(DuckDB\nAnalytical Store)]
-        A[Artifact Export\nJSON · CSV · HTML · MD]
-        DASH[Streamlit Dashboard\n7 pages]
-    end
-
-    Y --> G
-    S --> G
-    G --> R
-    R --> D
-    D --> B
-    B --> M
-    M --> R
-    R --> ME
-    ME --> FV
-    ME --> PR
-    FV --> DB
-    PR --> DB
-    ME --> DB
-    DB --> A
-    DB --> DASH
-```
+<p align="center">
+  <img src="docs/images/persistbench_architecture_dark.svg" width="1100" alt="PersistBench architecture diagram with dark research-grade styling">
+</p>
 
 **Defense middleware hook points** (called by `ReplayEngine` at each event):
 
