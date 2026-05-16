@@ -2,6 +2,8 @@
 
 **A reproducible benchmark for evaluating persistent, cross-session adversarial attacks against memory-enabled, tool-augmented LLM agents.**
 
+`77 scenarios` · `3 attack suites` · `7 defenses` · `provenance-aware replay` · `FVS-1–15`
+
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![DuckDB](https://img.shields.io/badge/DuckDB-0.10%2B-yellow)](https://duckdb.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35%2B-red)](https://streamlit.io/)
@@ -369,13 +371,13 @@ PersistBench is not only a benchmark runner. It includes a research observabilit
 **Live Dashboard:** https://persistbench.streamlit.app/
 
 <p align="center">
-  <a href="https://persistbench.streamlit.app/">
-    <img src="docs/gifs/persistbench_demo.gif" width="900" alt="PersistBench dashboard walkthrough">
-  </a>
+  <img src="docs/images/dashboard_hero.png" width="900" alt="Memory and Provenance — provenance lineage DAG with trust and toxicity evolution">
 </p>
 
 <p align="center">
-  <img src="docs/images/dashboard_hero.png" width="900" alt="Memory and Provenance — provenance lineage DAG with trust and toxicity evolution">
+  <a href="https://persistbench.streamlit.app/">
+    <img src="docs/gifs/persistbench_demo.gif" width="900" alt="PersistBench dashboard walkthrough">
+  </a>
 </p>
 
 The dashboard is read-only. All pages issue analytical queries directly against a local or hosted DuckDB file. No external service, no streaming pipeline, and no cloud state are required — making it suitable for offline reproducible analysis.
@@ -403,7 +405,7 @@ graph LR
 | Defense & Metrics | ![Defense & Metrics](docs/images/page_defense_and_metrics.png) | Flag scatter plot (TP/FP), confidence calibration, defense latency, metric reference cards |
 | Cross-Run Comparison | ![Cross-Run Comparison](docs/images/page_cross-run_comparison.png) | Defense leaderboard, grouped bar charts, radar chart, utility-security tradeoff analysis |
 | Artifacts & About | ![Artifacts & About](docs/images/page_artifacts_and_about.png) | In-memory export (CSV / JSON / Markdown / HTML), suite descriptions, citation block |
-| V3 Analysis | — | ConsolidationEngine timelines, archive resurrection events, semantic probing results |
+| V3 Analysis | *dynamic — content varies by V3 backend configuration* | ConsolidationEngine timelines, archive resurrection events, semantic probing results |
 
 ### Overview
 
