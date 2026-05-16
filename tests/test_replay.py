@@ -149,7 +149,10 @@ def test_provenance_events_written(seeded_conn, scenario, trace):
     count = seeded_conn.execute(
         "SELECT count(*) FROM provenance_events WHERE run_id='run-001'"
     ).fetchone()[0]
-    assert count == len(scenario["attack"]["fragments"])
+    n_frags = len(scenario["attack"]["fragments"])
+    # create events (one per fragment) + reinforce events (trigger session)
+    # + access events (probe sessions) — total >= n_frags
+    assert count >= n_frags
 
 
 def test_provenance_chain_valid(seeded_conn, scenario, trace):
@@ -262,6 +265,61 @@ def test_bdi_increases_after_trigger(seeded_conn, scenario, trace):
             assert bdi is not None and bdi > 0.0, (
                 f"Expected BDI>0 after trigger, got {bdi}"
             )
+
+
+# -----------------------------------------------------------------
+# V2.1 — Embedding integration
+# -----------------------------------------------------------------
+
+def test_memory_entries_have_embeddings(seeded_conn, scenario, trace):
+    """After replay, every adversarial memory entry has a non-null content_embedding."""
+    engine = make_engine(seeded_conn, scenario)
+    engine.run(trace)
+    rows = seeded_conn.execute(
+        "SELECT entry_id, content_embedding FROM memory_entries "
+        "WHERE run_id='run-001' AND is_adversarial = TRUE"
+    ).fetchall()
+    assert rows, "No adversarial memory entries found"
+    for entry_id, blob in rows:
+        assert blob is not None, f"entry {entry_id} missing content_embedding"
+        assert len(blob) == 384 * 4, (
+            f"entry {entry_id} embedding has wrong byte length: {len(blob)}"
+        )
+
+
+def test_snapshots_have_embeddings(seeded_conn, scenario, trace):
+    """Every memory_entry_snapshot row produced by replay has an embedding."""
+    engine = make_engine(seeded_conn, scenario)
+    engine.run(trace)
+    rows = seeded_conn.execute(
+        "SELECT entry_id, session_id, embedding FROM memory_entry_snapshots "
+        "WHERE run_id='run-001'"
+    ).fetchall()
+    assert rows, "No snapshot rows found"
+    for entry_id, session_id, blob in rows:
+        assert blob is not None, (
+            f"snapshot ({entry_id}, session={session_id}) missing embedding"
+        )
+        assert len(blob) == 384 * 4
+
+
+def test_embedding_roundtrip_consistent(seeded_conn, scenario, trace):
+    """Embedding bytes stored in memory_entries can be deserialized to a valid 384-d vector."""
+    import numpy as np
+    from persistbench.embeddings import bytes_to_vec, DIM
+
+    engine = make_engine(seeded_conn, scenario)
+    engine.run(trace)
+    blobs = seeded_conn.execute(
+        "SELECT content_embedding FROM memory_entries WHERE run_id='run-001'"
+    ).fetchall()
+    for (blob,) in blobs:
+        if blob is None:
+            continue
+        v = bytes_to_vec(blob)
+        assert v.shape == (DIM,)
+        assert v.dtype == np.float32
+        assert abs(np.linalg.norm(v) - 1.0) < 1e-4, "Stored embedding is not L2-normalized"
 
 
 # -----------------------------------------------------------------

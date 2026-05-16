@@ -266,18 +266,21 @@ def test_leaderboard_ordering(conn):
 # -----------------------------------------------------------------
 
 def test_v2_writer_stubs_raise():
-    # write_memory_entry_snapshot promoted to v1 — excluded from this check
+    # write_memory_entry_snapshot promoted to v1 — excluded
+    # write_behavioral_probe promoted to v2.3 — excluded
+    # write_deletion_record promoted to v2.4 — excluded
+    # write_forgetting_validation promoted to v2.4 — excluded
+    # write_provenance_lineage promoted to V3 (real implementation) — excluded
     for fn in (writers.write_run_scenario,
-               writers.write_provenance_lineage, writers.write_deletion_record,
-               writers.write_memory_conflict, writers.write_governance_action,
-               writers.write_behavioral_probe, writers.write_forgetting_validation):
+               writers.write_memory_conflict, writers.write_governance_action):
         with pytest.raises(NotImplementedError):
             fn()
 
 
 def test_v2_query_stubs_raise():
-    for fn in (queries.get_trust_evolution, queries.get_cra,
-               queries.get_provenance_chain, queries.get_fvs_summary):
+    # get_fvs_summary promoted to v2.4 — excluded
+    # get_provenance_chain promoted to V3 (real implementation) — excluded
+    for fn in (queries.get_trust_evolution, queries.get_cra):
         with pytest.raises(NotImplementedError):
             fn()
 

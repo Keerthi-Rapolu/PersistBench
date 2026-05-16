@@ -86,18 +86,21 @@ def write_memory_entry(conn: duckdb.DuckDBPyConnection, *,
                        reinforcement_count: int = 0,
                        mutation_count: int = 0,
                        is_adversarial: bool = None,
-                       adversarial_fragment_id: str = None) -> None:
+                       adversarial_fragment_id: str = None,
+                       content_embedding: bytes = None) -> None:
     conn.execute("""
         INSERT OR REPLACE INTO memory_entries
         (run_id, scenario_id, entry_id, created_session, created_turn,
          content_hash, lifecycle_stage, confidence, trust_score,
          toxicity_score, reinforcement_count, mutation_count,
-         is_adversarial, adversarial_fragment_id, last_updated_session)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         is_adversarial, adversarial_fragment_id, last_updated_session,
+         content_embedding)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, [run_id, scenario_id, entry_id, created_session, created_turn,
           content_hash, lifecycle_stage, confidence, trust_score,
           toxicity_score, reinforcement_count, mutation_count,
-          is_adversarial, adversarial_fragment_id, created_session])
+          is_adversarial, adversarial_fragment_id, created_session,
+          content_embedding])
 
 
 def _compute_chain_hash(prev_hash: Optional[str], event_id: str,
@@ -180,21 +183,23 @@ def write_scenario_metrics(conn: duckdb.DuckDBPyConnection, *,
                            flags_emitted: int = None,
                            false_positives: int = None,
                            clean_state_achieved: bool = None,
-                           composite_score: float = None) -> None:
+                           composite_score: float = None,
+                           fvs: float = None,
+                           rr: float = None) -> None:
     conn.execute("""
         INSERT OR REPLACE INTO scenario_metrics
         (run_id, scenario_id, aps, rls, ups, ps_10, ps_50, chl,
          bdi_10, bdi_50, leakage_rate, fss, cra, mts_mean, prs_mean,
          ass_50, res_mid, attack_detected, detection_session,
          recovery_session, flags_emitted, false_positives,
-         clean_state_achieved, composite_score)
+         clean_state_achieved, composite_score, fvs, rr)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, [run_id, scenario_id, aps, rls, ups, ps_10, ps_50, chl,
           bdi_10, bdi_50, leakage_rate, fss, cra, mts_mean, prs_mean,
           ass_50, res_mid, attack_detected, detection_session,
           recovery_session, flags_emitted, false_positives,
-          clean_state_achieved, composite_score])
+          clean_state_achieved, composite_score, fvs, rr])
 
 
 def write_suite_metrics(conn: duckdb.DuckDBPyConnection, *,
@@ -221,7 +226,8 @@ def write_memory_entry_snapshot(conn: duckdb.DuckDBPyConnection, *,
                                 entry_id: str, session_id: int,
                                 confidence: float, trust_score: float,
                                 toxicity_score: float,
-                                lifecycle_stage: str) -> None:
+                                lifecycle_stage: str,
+                                embedding: bytes = None) -> None:
     """Record a point-in-time snapshot of a memory entry's scores.
 
     Called once per memory entry per session to power trust-evolution
@@ -230,10 +236,12 @@ def write_memory_entry_snapshot(conn: duckdb.DuckDBPyConnection, *,
     conn.execute("""
         INSERT OR REPLACE INTO memory_entry_snapshots
         (run_id, scenario_id, entry_id, session_id,
-         confidence, trust_score, toxicity_score, lifecycle_stage)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         confidence, trust_score, toxicity_score, lifecycle_stage,
+         embedding)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, [run_id, scenario_id, entry_id, session_id,
-          confidence, trust_score, toxicity_score, lifecycle_stage])
+          confidence, trust_score, toxicity_score, lifecycle_stage,
+          embedding])
 
 
 # =================================================================
@@ -246,14 +254,70 @@ def write_run_scenario(*args, **kwargs):
 def update_run_scenario_status(*args, **kwargs):
     raise NotImplementedError("run_scenarios is a v2 table")
 
-def write_behavioral_probe(*args, **kwargs):
-    raise NotImplementedError("behavioral_probes is a v2 table -- define probe set first")
 
-def write_provenance_lineage(*args, **kwargs):
-    raise NotImplementedError("provenance_lineage is a v2 table")
+def write_behavioral_probe(conn: duckdb.DuckDBPyConnection, *,
+                           run_id: str, scenario_id: str,
+                           session_id: int, probe_id: str,
+                           probe_domain: str, probe_type: str,
+                           response_text: str,
+                           safety_passed: bool = None,
+                           action_taken: str = None) -> None:
+    """Record an agent's probe response with its embedding for BDI_sem computation.
 
-def write_deletion_record(*args, **kwargs):
-    raise NotImplementedError("deletion_records is a v2 table")
+    response_embedding is always written so get_bdi_semantic() can compute
+    cosine drift from the baseline (earliest probe session) to any later session.
+    Design ref: §24.4 (BDI_sem = 1 − cosine(h_s, h_baseline))
+    """
+    import hashlib as _hashlib
+    from persistbench.embeddings import encode as _encode, vec_to_bytes as _vec_to_bytes
+
+    response_hash = "sha256:" + _hashlib.sha256(response_text.encode()).hexdigest()
+    embedding = _vec_to_bytes(_encode(response_text))
+    conn.execute("""
+        INSERT OR REPLACE INTO behavioral_probes
+        (run_id, scenario_id, session_id, probe_id, probe_domain,
+         probe_type, response_hash, action_taken, safety_passed, response_embedding)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, [run_id, scenario_id, session_id, probe_id, probe_domain,
+          probe_type, response_hash, action_taken, safety_passed, embedding])
+
+def write_provenance_lineage(conn: duckdb.DuckDBPyConnection, *,
+                             run_id: str, scenario_id: str,
+                             child_entry_id: str, parent_entry_id: str) -> None:
+    """Record a parent→child edge in the provenance DAG (V3.4).
+
+    Used for multi-parent lineage (summaries that have multiple source entries).
+    Silently ignores duplicate edges (idempotent).
+    """
+    conn.execute("""
+        INSERT OR IGNORE INTO provenance_lineage
+        (run_id, scenario_id, child_entry_id, parent_entry_id)
+        VALUES (?, ?, ?, ?)
+    """, [run_id, scenario_id, child_entry_id, parent_entry_id])
+
+
+def write_deletion_record(conn: duckdb.DuckDBPyConnection, *,
+                          run_id: str, scenario_id: str,
+                          entry_id: str, deletion_event_id: str,
+                          deletion_level: str,
+                          verification_status: str = "pending",
+                          deletion_certificate_hash: str = None) -> None:
+    """Record a deletion attempt with its completeness level and certificate.
+
+    deletion_level: "soft" | "hard" | "verified" | "forensic"
+      soft     — removed from primary store, may persist in archives/indices
+      hard     — removed from primary + indices (DuckDB + Qdrant)
+      verified — removed from all stores, deletion confirmed by oracle
+      forensic — verified + full audit trail retained (§27.2)
+    """
+    conn.execute("""
+        INSERT OR REPLACE INTO deletion_records
+        (run_id, scenario_id, entry_id, deletion_event_id,
+         deletion_level, verification_status, deletion_certificate_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, [run_id, scenario_id, entry_id, deletion_event_id,
+          deletion_level, verification_status, deletion_certificate_hash])
+
 
 def write_memory_conflict(*args, **kwargs):
     raise NotImplementedError("memory_conflicts is a v2 table")
@@ -261,5 +325,132 @@ def write_memory_conflict(*args, **kwargs):
 def write_governance_action(*args, **kwargs):
     raise NotImplementedError("governance_actions is a v2 table")
 
-def write_forgetting_validation(*args, **kwargs):
-    raise NotImplementedError("forgetting_validation is a v2 table")
+
+# =================================================================
+# V3 WRITERS — Semantic Consolidation & Archive Persistence
+# =================================================================
+
+def write_memory_summary(conn: duckdb.DuckDBPyConnection, *,
+                         summary_id: str, run_id: str, scenario_id: str,
+                         created_session: int,
+                         source_entry_ids: list,
+                         summary_type: str,
+                         is_adversarial: bool,
+                         toxicity_score: float,
+                         content_hash: str = None,
+                         embedding: bytes = None) -> None:
+    """Write a derived memory summary produced by the ConsolidationEngine (§V3.1)."""
+    conn.execute("""
+        INSERT OR REPLACE INTO memory_summaries
+        (summary_id, run_id, scenario_id, created_session,
+         content_hash, embedding, source_entry_ids,
+         summary_type, is_adversarial, toxicity_score)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, [summary_id, run_id, scenario_id, created_session,
+          content_hash, embedding, source_entry_ids,
+          summary_type, is_adversarial, toxicity_score])
+
+
+def write_summary_lineage_edge(conn: duckdb.DuckDBPyConnection, *,
+                                edge_id: str, run_id: str, scenario_id: str,
+                                parent_id: str, child_id: str,
+                                lineage_type: str, session_id: int) -> None:
+    """Write a parent→child edge in the summary lineage DAG (§V3.1)."""
+    conn.execute("""
+        INSERT OR IGNORE INTO summary_lineage
+        (edge_id, run_id, scenario_id, parent_id, child_id,
+         lineage_type, session_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, [edge_id, run_id, scenario_id, parent_id, child_id,
+          lineage_type, session_id])
+
+
+def write_consolidation_event(conn: duckdb.DuckDBPyConnection, *,
+                               event_id: str, run_id: str, scenario_id: str,
+                               session_id: int, summary_id: str,
+                               event_type: str) -> None:
+    """Write a consolidation lifecycle event (§V3.1).
+
+    event_type: 'generate' | 'mutate' | 'reinforce' | 'archive'
+    """
+    conn.execute("""
+        INSERT OR IGNORE INTO consolidation_events
+        (event_id, run_id, scenario_id, session_id, summary_id, event_type)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, [event_id, run_id, scenario_id, session_id, summary_id, event_type])
+
+
+def write_archived_memory_entry(conn: duckdb.DuckDBPyConnection, *,
+                                 archive_id: str, entry_id: str,
+                                 run_id: str, scenario_id: str,
+                                 archived_session: int,
+                                 archive_reason: str = "age",
+                                 embedding: bytes = None,
+                                 toxicity_score: float = None,
+                                 is_adversarial: bool = None) -> None:
+    """Write an archived entry to the cold-storage tier (§V3.2).
+
+    archive_reason: 'age' | 'capacity' | 'explicit'
+    """
+    conn.execute("""
+        INSERT OR IGNORE INTO archived_memory_entries
+        (archive_id, entry_id, run_id, scenario_id,
+         archived_session, archive_reason, embedding,
+         toxicity_score, is_adversarial)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, [archive_id, entry_id, run_id, scenario_id,
+          archived_session, archive_reason, embedding,
+          toxicity_score, is_adversarial])
+
+
+def write_archive_access_event(conn: duckdb.DuckDBPyConnection, *,
+                                event_id: str, archive_id: str,
+                                run_id: str, scenario_id: str,
+                                session_id: int, access_reason: str,
+                                similarity_score: float = None) -> None:
+    """Record an access event against an archived entry (§V3.2).
+
+    access_reason: 'promotion' | 'retrieval' | 'inspection'
+    """
+    conn.execute("""
+        INSERT OR IGNORE INTO archive_access_events
+        (event_id, archive_id, run_id, scenario_id,
+         session_id, access_reason, similarity_score)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, [event_id, archive_id, run_id, scenario_id,
+          session_id, access_reason, similarity_score])
+
+
+def write_archive_resurrection_event(conn: duckdb.DuckDBPyConnection, *,
+                                      event_id: str, archive_id: str,
+                                      run_id: str, scenario_id: str,
+                                      session_id: int,
+                                      trigger_query: str = None,
+                                      similarity_score: float = None,
+                                      was_adversarial: bool = None) -> None:
+    """Record that an archived entry was semantically resurrected (§V3.2, FVS-6)."""
+    conn.execute("""
+        INSERT OR IGNORE INTO archive_resurrection_events
+        (event_id, archive_id, run_id, scenario_id,
+         session_id, trigger_query, similarity_score, was_adversarial)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, [event_id, archive_id, run_id, scenario_id,
+          session_id, trigger_query, similarity_score, was_adversarial])
+
+
+def write_forgetting_validation(conn: duckdb.DuckDBPyConnection, *,
+                                run_id: str, scenario_id: str,
+                                entry_id: str, fvs_test_id: str,
+                                sessions_after_deletion: int,
+                                passed: bool,
+                                resurfaced_content_hash: str = None,
+                                resurfacing_pathway: str = None) -> None:
+    """Record one FVS test result for a deleted memory entry (§27.4)."""
+    conn.execute("""
+        INSERT OR REPLACE INTO forgetting_validation
+        (run_id, scenario_id, entry_id, fvs_test_id,
+         sessions_after_deletion, passed, resurfaced_content_hash, resurfacing_pathway)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, [run_id, scenario_id, entry_id, fvs_test_id,
+          sessions_after_deletion, passed,
+          resurfaced_content_hash, resurfacing_pathway])

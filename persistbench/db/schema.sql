@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS memory_entries (
     is_adversarial      BOOLEAN,        -- set by oracle after run
     adversarial_fragment_id TEXT,
     last_updated_session INTEGER,
+    content_embedding   BLOB,           -- V2: L2-normalized 384-d float32 (all-MiniLM-L6-v2)
     PRIMARY KEY (run_id, scenario_id, entry_id)
 );
 
@@ -187,6 +188,7 @@ CREATE TABLE IF NOT EXISTS memory_entry_snapshots (
     trust_score     DOUBLE NOT NULL,
     toxicity_score  DOUBLE NOT NULL,
     lifecycle_stage TEXT NOT NULL,
+    embedding       BLOB,               -- V2: per-session L2-normalized 384-d float32
     PRIMARY KEY (run_id, scenario_id, entry_id, session_id)
 );
 
@@ -281,6 +283,103 @@ CREATE TABLE IF NOT EXISTS forgetting_validation (
     resurfacing_pathway TEXT,
     PRIMARY KEY (run_id, scenario_id, entry_id, fvs_test_id)
 );
+
+-- =================================================================
+-- V3 TABLES — Semantic Consolidation & Archive Persistence
+-- =================================================================
+
+-- V3.1: Derived memory summaries produced by the consolidation engine
+CREATE TABLE IF NOT EXISTS memory_summaries (
+    summary_id       TEXT PRIMARY KEY,
+    run_id           TEXT NOT NULL,
+    scenario_id      TEXT NOT NULL,
+    created_session  INTEGER NOT NULL,
+    content_hash     TEXT,
+    embedding        BLOB,               -- 384-d L2-normalized float32 BLOB
+    source_entry_ids TEXT[],             -- parent entry_ids
+    summary_type     TEXT,               -- 'extractive' | 'abstractive' | 'latent'
+    is_adversarial   BOOLEAN,
+    toxicity_score   DOUBLE,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- V3.1: Parent-child lineage edges in the consolidation DAG
+CREATE TABLE IF NOT EXISTS summary_lineage (
+    edge_id       TEXT PRIMARY KEY,
+    run_id        TEXT NOT NULL,
+    scenario_id   TEXT NOT NULL,
+    parent_id     TEXT NOT NULL,        -- entry_id or summary_id
+    child_id      TEXT NOT NULL,        -- summary_id
+    lineage_type  TEXT,                 -- 'summarize' | 'merge' | 'compress'
+    session_id    INTEGER,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- V3.1: Consolidation lifecycle events (generate / mutate / reinforce / archive)
+CREATE TABLE IF NOT EXISTS consolidation_events (
+    event_id      TEXT PRIMARY KEY,
+    run_id        TEXT NOT NULL,
+    scenario_id   TEXT NOT NULL,
+    session_id    INTEGER NOT NULL,
+    summary_id    TEXT NOT NULL,
+    event_type    TEXT,                 -- 'generate' | 'mutate' | 'reinforce' | 'archive'
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- V3.2: Cold-storage archive of memory entries
+CREATE TABLE IF NOT EXISTS archived_memory_entries (
+    archive_id       TEXT PRIMARY KEY,
+    entry_id         TEXT NOT NULL,
+    run_id           TEXT NOT NULL,
+    scenario_id      TEXT NOT NULL,
+    archived_session INTEGER NOT NULL,
+    archive_reason   TEXT,              -- 'age' | 'capacity' | 'explicit'
+    embedding        BLOB,              -- 384-d float32 retained for semantic probing
+    toxicity_score   DOUBLE,
+    is_adversarial   BOOLEAN,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- V3.2: Archive access events (promotion, retrieval, inspection)
+CREATE TABLE IF NOT EXISTS archive_access_events (
+    event_id         TEXT PRIMARY KEY,
+    archive_id       TEXT NOT NULL,
+    run_id           TEXT NOT NULL,
+    scenario_id      TEXT NOT NULL,
+    session_id       INTEGER NOT NULL,
+    access_reason    TEXT,              -- 'promotion' | 'retrieval' | 'inspection'
+    similarity_score DOUBLE,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- V3.2: Archive resurrection events — deleted entries re-entering active context
+CREATE TABLE IF NOT EXISTS archive_resurrection_events (
+    event_id          TEXT PRIMARY KEY,
+    archive_id        TEXT NOT NULL,
+    run_id            TEXT NOT NULL,
+    scenario_id       TEXT NOT NULL,
+    session_id        INTEGER NOT NULL,
+    trigger_query     TEXT,
+    similarity_score  DOUBLE,
+    was_adversarial   BOOLEAN,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ---- V3 INDEXES --------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_summaries_run      ON memory_summaries(run_id, scenario_id);
+CREATE INDEX IF NOT EXISTS idx_lineage_parent     ON summary_lineage(run_id, parent_id);
+CREATE INDEX IF NOT EXISTS idx_lineage_child      ON summary_lineage(run_id, child_id);
+CREATE INDEX IF NOT EXISTS idx_archived_run       ON archived_memory_entries(run_id, scenario_id);
+CREATE INDEX IF NOT EXISTS idx_resurrections_run  ON archive_resurrection_events(run_id, scenario_id);
+
+-- ---- V2 MIGRATION GUARDS ----------------------------------------
+-- Idempotent: safe to run on any database regardless of whether V2 columns exist.
+-- ADD COLUMN IF NOT EXISTS is supported in DuckDB >= 1.0.
+ALTER TABLE memory_entries        ADD COLUMN IF NOT EXISTS content_embedding BLOB;
+ALTER TABLE memory_entry_snapshots ADD COLUMN IF NOT EXISTS embedding        BLOB;
+ALTER TABLE behavioral_probes     ADD COLUMN IF NOT EXISTS response_embedding BLOB;
+ALTER TABLE scenario_metrics      ADD COLUMN IF NOT EXISTS fvs              DOUBLE;
+ALTER TABLE scenario_metrics      ADD COLUMN IF NOT EXISTS rr               DOUBLE;
 
 -- ---- INDEXES (core tables only) ---------------------------------
 CREATE INDEX IF NOT EXISTS idx_sessions_run      ON sessions(run_id, scenario_id);

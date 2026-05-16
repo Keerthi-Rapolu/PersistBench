@@ -15,3 +15,5 @@ qdrant_data/
 results/
 artifacts/
 .pytest_cache/
+
+*.log
