@@ -1,0 +1,2 @@
+*.duckdb binary
+*.duckdb.wal binary
