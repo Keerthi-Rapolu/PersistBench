@@ -1,0 +1,210 @@
+<svg width="1600" height="960" viewBox="0 0 1600 960" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">PersistBench architecture diagram</title>
+  <desc id="desc">Dark-mode research architecture figure showing input, trace generation, replay engine, evaluation, and output components for PersistBench.</desc>
+  <defs>
+    <linearGradient id="bg" x1="160" y1="80" x2="1440" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f1117"/>
+      <stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <radialGradient id="focus" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(820 430) rotate(90) scale(420 560)">
+      <stop offset="0" stop-color="#1e293b" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#1e293b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="container" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#273449"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="cardBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22364c"/>
+      <stop offset="1" stop-color="#1b2a3d"/>
+    </linearGradient>
+    <linearGradient id="cardAmber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b3120"/>
+      <stop offset="1" stop-color="#2a2317"/>
+    </linearGradient>
+    <linearGradient id="cardGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#18372f"/>
+      <stop offset="1" stop-color="#142b27"/>
+    </linearGradient>
+    <linearGradient id="cardRose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3c2630"/>
+      <stop offset="1" stop-color="#2b1d24"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#020617" flood-opacity="0.18"/>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#020617" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10V0Z" fill="#94a3b8"/>
+    </marker>
+    <style>
+      .title { font: 700 32px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #f8fafc; letter-spacing: -0.02em; }
+      .subtitle { font: 500 15px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #94a3b8; letter-spacing: 0.01em; }
+      .section { font: 600 19px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #f8fafc; letter-spacing: -0.01em; }
+      .sectionMeta { font: 500 12px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #94a3b8; letter-spacing: 0.12em; text-transform: uppercase; }
+      .nodeTitle { font: 600 18px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #f8fafc; letter-spacing: -0.01em; }
+      .nodeMeta { font: 500 13px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #cbd5e1; }
+      .smallMeta { font: 500 12px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #94a3b8; }
+      .accentBlue { fill: #38bdf8; }
+      .accentAmber { fill: #f59e0b; }
+      .accentGreen { fill: #10b981; }
+      .accentRose { fill: #fb7185; }
+      .connector { stroke: #94a3b8; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .connectorSoft { stroke: #64748b; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); opacity: 0.95; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="960" rx="28" fill="url(#bg)"/>
+  <rect width="1600" height="960" rx="28" fill="url(#focus)"/>
+
+  <g opacity="0.16">
+    <path d="M120 120H1480" stroke="#334155"/>
+    <path d="M120 840H1480" stroke="#334155"/>
+    <path d="M120 120V840" stroke="#1e293b"/>
+    <path d="M1480 120V840" stroke="#1e293b"/>
+  </g>
+
+  <text x="120" y="72" class="title">PersistBench Architecture</text>
+  <text x="120" y="104" class="subtitle">Longitudinal replay pipeline for persistent cross-session adversarial evaluation</text>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="160" width="250" height="270" rx="16" fill="url(#container)" stroke="#334155"/>
+    <text x="120" y="204" class="sectionMeta">Stage 1</text>
+    <text x="120" y="232" class="section">Input</text>
+    <path d="M116 246H314" stroke="#334155"/>
+
+    <rect x="118" y="270" width="194" height="72" rx="10" fill="url(#cardRose)" stroke="#64748b"/>
+    <rect x="118" y="270" width="5" height="72" rx="3" class="accentRose"/>
+    <text x="140" y="300" class="nodeTitle">Scenario YAML</text>
+    <text x="140" y="323" class="nodeMeta">attack fragments, trigger turns</text>
+
+    <rect x="118" y="356" width="194" height="72" rx="10" fill="url(#card)" stroke="#64748b"/>
+    <text x="140" y="386" class="nodeTitle">Seed / RNG</text>
+    <text x="140" y="409" class="nodeMeta">deterministic trace control</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="462" width="250" height="180" rx="16" fill="url(#container)" stroke="#334155"/>
+    <text x="120" y="506" class="sectionMeta">Stage 2</text>
+    <text x="120" y="534" class="section">Trace Generation</text>
+    <path d="M116 548H314" stroke="#334155"/>
+
+    <rect x="118" y="578" width="194" height="72" rx="10" fill="url(#card)" stroke="#64748b"/>
+    <text x="140" y="608" class="nodeTitle">SLIS Generator</text>
+    <text x="140" y="631" class="nodeMeta">session-level injection sequencer</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="400" y="140" width="470" height="560" rx="16" fill="url(#container)" stroke="#334155"/>
+    <text x="432" y="184" class="sectionMeta">Stage 3</text>
+    <text x="432" y="212" class="section">Replay Engine</text>
+    <path d="M428 226H842" stroke="#334155"/>
+
+    <rect x="434" y="258" width="402" height="88" rx="12" fill="url(#cardAmber)" stroke="#f59e0b"/>
+    <rect x="434" y="258" width="6" height="88" rx="3" class="accentAmber"/>
+    <text x="462" y="292" class="nodeTitle">Defense Middleware</text>
+    <text x="462" y="316" class="nodeMeta">PLS  MW  TOH  DEV  PS  CD</text>
+    <text x="462" y="336" class="smallMeta">pre-turn, post-turn, and memory-write interception</text>
+
+    <rect x="472" y="378" width="326" height="118" rx="12" fill="url(#card)" stroke="#93a4ba"/>
+    <text x="505" y="425" class="nodeTitle">ReplayEngine</text>
+    <text x="505" y="451" class="nodeMeta">multi-session oracle replay orchestration</text>
+    <text x="505" y="474" class="smallMeta">attack injection timing, probe sessions, deterministic traces</text>
+
+    <rect x="434" y="534" width="182" height="102" rx="12" fill="url(#card)" stroke="#64748b"/>
+    <text x="458" y="573" class="nodeTitle">Agent Backend</text>
+    <text x="458" y="598" class="nodeMeta">Echo  Claude  OpenAI</text>
+
+    <rect x="652" y="534" width="184" height="102" rx="12" fill="url(#cardGreen)" stroke="#10b981"/>
+    <rect x="652" y="534" width="6" height="102" rx="3" class="accentGreen"/>
+    <text x="678" y="573" class="nodeTitle">Memory Store</text>
+    <text x="678" y="598" class="nodeMeta">DuckDB  Qdrant</text>
+    <text x="678" y="620" class="smallMeta">persistent state and retrieval loop</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="930" y="160" width="290" height="330" rx="16" fill="url(#container)" stroke="#334155"/>
+    <text x="960" y="204" class="sectionMeta">Stage 4</text>
+    <text x="960" y="232" class="section">Evaluation</text>
+    <path d="M956 246H1190" stroke="#334155"/>
+
+    <rect x="958" y="274" width="234" height="88" rx="12" fill="url(#cardBlue)" stroke="#38bdf8"/>
+    <rect x="958" y="274" width="6" height="88" rx="3" class="accentBlue"/>
+    <text x="984" y="307" class="nodeTitle">Metrics Computation</text>
+    <text x="984" y="331" class="nodeMeta">APS  RLS  UPS  BDI  FVS  CRA</text>
+
+    <rect x="958" y="382" width="234" height="88" rx="12" fill="url(#cardGreen)" stroke="#10b981"/>
+    <rect x="958" y="382" width="6" height="88" rx="3" class="accentGreen"/>
+    <text x="984" y="415" class="nodeTitle">Provenance DAG</text>
+    <text x="984" y="439" class="nodeMeta">BFS ancestor / descendant analysis</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="930" y="520" width="290" height="180" rx="16" fill="url(#container)" stroke="#334155"/>
+    <text x="960" y="564" class="sectionMeta">Stage 4b</text>
+    <text x="960" y="592" class="section">Forgetting Validation</text>
+    <path d="M956 606H1190" stroke="#334155"/>
+
+    <rect x="958" y="634" width="234" height="72" rx="12" fill="url(#cardBlue)" stroke="#64748b"/>
+    <text x="984" y="664" class="nodeTitle">ForgettingValidator</text>
+    <text x="984" y="687" class="nodeMeta">FVS-1 through FVS-15</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1280" y="160" width="230" height="540" rx="16" fill="url(#container)" stroke="#334155"/>
+    <text x="1310" y="204" class="sectionMeta">Stage 5</text>
+    <text x="1310" y="232" class="section">Output</text>
+    <path d="M1306 246H1480" stroke="#334155"/>
+
+    <g filter="url(#softShadow)">
+      <rect x="1310" y="282" width="170" height="116" rx="12" fill="url(#cardGreen)" stroke="#10b981"/>
+      <ellipse cx="1395" cy="304" rx="62" ry="14" fill="#24453d" stroke="#10b981"/>
+      <path d="M1333 304V372C1333 380 1361 386 1395 386C1429 386 1457 380 1457 372V304" stroke="#10b981" fill="none"/>
+      <text x="1350" y="334" class="nodeTitle">DuckDB</text>
+      <text x="1340" y="359" class="nodeMeta">analytical store</text>
+    </g>
+
+    <rect x="1310" y="432" width="170" height="88" rx="12" fill="url(#card)" stroke="#64748b"/>
+    <text x="1336" y="466" class="nodeTitle">Artifact Export</text>
+    <text x="1336" y="490" class="nodeMeta">JSON  CSV  HTML  MD</text>
+
+    <rect x="1310" y="548" width="170" height="88" rx="12" fill="url(#card)" stroke="#64748b"/>
+    <text x="1336" y="582" class="nodeTitle">Dashboard</text>
+    <text x="1336" y="606" class="nodeMeta">7-page Streamlit observability</text>
+  </g>
+
+  <path class="connector" d="M312 306C360 306 360 614 118 614"/>
+  <path class="connector" d="M312 392C358 392 358 614 312 614"/>
+  <path class="connector" d="M312 614C358 614 386 614 432 614"/>
+
+  <path class="connector" d="M312 614C376 614 376 437 470 437"/>
+  <path class="connector" d="M798 437C862 437 862 318 958 318"/>
+  <path class="connectorSoft" d="M635 378C635 350 635 346 635 346"/>
+  <path class="connectorSoft" d="M635 346C635 346 635 346 635 378"/>
+
+  <path class="connectorSoft" d="M635 496C635 520 526 520 526 534"/>
+  <path class="connectorSoft" d="M616 585C632 585 642 585 652 585"/>
+  <path class="connectorSoft" d="M744 534C744 512 698 500 676 496"/>
+  <path class="connectorSoft" d="M836 585C886 585 886 437 798 437"/>
+
+  <path class="connector" d="M1075 362C1075 374 1075 374 1075 382"/>
+  <path class="connector" d="M1075 362C1075 470 1075 470 1075 634"/>
+
+  <path class="connector" d="M1192 318C1240 318 1248 318 1310 318"/>
+  <path class="connectorSoft" d="M1192 426C1242 426 1244 332 1310 332"/>
+  <path class="connectorSoft" d="M1192 670C1244 670 1244 346 1310 346"/>
+  <path class="connectorSoft" d="M1395 398C1395 414 1395 420 1395 432"/>
+  <path class="connectorSoft" d="M1395 398C1395 470 1395 478 1395 548"/>
+
+  <circle cx="312" cy="614" r="4" fill="#94a3b8"/>
+  <circle cx="798" cy="437" r="4" fill="#94a3b8"/>
+  <circle cx="1075" cy="362" r="4" fill="#94a3b8"/>
+
+  <text x="120" y="890" class="smallMeta">ReplayEngine remains the control-plane center; defense, provenance, and durable storage are visually emphasized for security benchmarking.</text>
+</svg>
