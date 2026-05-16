@@ -86,20 +86,20 @@
   <text x="78" y="95" class="subtitle">Longitudinal replay pipeline for persistent cross-session adversarial evaluation</text>
 
   <g filter="url(#panelShadow)">
-    <rect x="60" y="120" width="264" height="250" rx="22" fill="url(#inputPanel)" fill-opacity="0.90" stroke="#ffffff" stroke-opacity="0.94"/>
+    <rect x="60" y="120" width="292" height="250" rx="22" fill="url(#inputPanel)" fill-opacity="0.90" stroke="#ffffff" stroke-opacity="0.94"/>
     <text x="84" y="150" class="sectionMeta">Stage 1</text>
     <text x="84" y="176" class="section">Input</text>
-    <path d="M84 188H302" class="mutedLine"/>
+    <path d="M84 188H330" class="mutedLine"/>
 
     <g filter="url(#cardShadow)">
-      <rect x="78" y="204" width="176" height="62" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="78" y="204" width="214" height="62" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="94" y="227" class="nodeTitle">Scenario YAML</text>
       <text x="94" y="245" class="nodeMeta">attack fragments, trigger turns</text>
       <text x="94" y="257" class="smallMeta">suite metadata and timing plan</text>
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="78" y="278" width="176" height="62" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="78" y="278" width="214" height="62" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="94" y="297" class="nodeTitle">Seed / RNG</text>
       <text x="94" y="315" class="nodeMeta">deterministic replay control</text>
       <text x="94" y="327" class="smallMeta">reproducible trace generation</text>
@@ -136,18 +136,18 @@
     </g>
 
     <g filter="url(#focusShadow)">
-      <rect x="432" y="292" width="322" height="116" rx="22" fill="#ffffff" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.99"/>
+      <rect x="432" y="292" width="322" height="126" rx="22" fill="#ffffff" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.99"/>
       <text x="456" y="331" class="nodeTitle">ReplayEngine</text>
       <text x="456" y="352" class="nodeMeta">multi-session orchestration across attack,</text>
       <text x="456" y="366" class="nodeMeta">probe, and trigger phases</text>
       <text x="456" y="381" class="smallMeta">deterministic traces, defense hooks,</text>
       <text x="456" y="394" class="smallMeta">session lifecycle control</text>
-      <rect x="606" y="374" width="112" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
-      <text x="629" y="390" class="chip">orchestrator</text>
+      <rect x="594" y="401" width="124" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
+      <text x="621" y="417" class="chip">orchestrator</text>
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="392" y="450" width="140" height="82" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="392" y="446" width="140" height="90" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="410" y="487" class="nodeTitle">Agent Backend</text>
       <text x="410" y="507" class="nodeMeta">Echo, Claude, OpenAI</text>
       <text x="410" y="521" class="smallMeta">oracle and live-model</text>
@@ -155,7 +155,7 @@
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="572" y="450" width="154" height="82" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="572" y="446" width="154" height="90" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="604" y="487" class="nodeTitle">Memory Store</text>
       <text x="604" y="507" class="nodeMeta">DuckDB, Qdrant</text>
       <text x="604" y="521" class="smallMeta">persistent state and</text>
@@ -178,7 +178,7 @@
     </g>
 
     <g filter="url(#accentShadow)">
-      <rect x="900" y="288" width="216" height="64" rx="18" fill="#ffffff" fill-opacity="0.84" stroke="#9ee5c1" stroke-opacity="0.75"/>
+      <rect x="900" y="288" width="216" height="64" rx="18" fill="#fafffc" fill-opacity="0.86" stroke="#8fddb9" stroke-opacity="0.82"/>
       <text x="920" y="307" class="nodeTitle">Provenance DAG</text>
       <text x="920" y="325" class="nodeMeta">ancestor and descendant</text>
       <text x="920" y="339" class="nodeMeta">lineage tracing</text>
@@ -228,8 +228,8 @@
     </g>
   </g>
 
-  <path class="connectorSoft" d="M254 235C302 245 324 328 334 466"/>
-  <path class="connectorSoft" d="M254 309C300 320 322 384 334 466"/>
+  <path class="connectorSoft" d="M292 235C326 246 344 328 350 466"/>
+  <path class="connectorSoft" d="M292 309C324 321 342 384 350 466"/>
   <path class="connector" d="M334 466C334 492 308 511 256 511"/>
 
   <path class="connector" d="M256 511C316 511 362 376 432 350"/>
@@ -239,8 +239,8 @@
   <path class="connectorSoft" d="M532 491C546 491 558 491 572 491"/>
   <path class="connectorSoft" d="M648 450C648 430 624 420 610 408"/>
 
-  <path class="connector" d="M754 350C836 350 860 250 900 240"/>
-  <path class="connectorSoft" d="M754 350C838 350 862 320 900 320"/>
+  <path class="connector" d="M754 350C826 348 850 248 900 236"/>
+  <path class="connectorSoft" d="M754 350C842 356 864 324 900 324"/>
   <path class="connectorSoft" d="M754 350C848 350 876 488 900 498"/>
 
   <path class="connector" d="M1116 240C1148 246 1166 264 1192 284"/>
@@ -253,5 +253,5 @@
   <circle cx="754" cy="350" r="3.5" fill="#64748b"/>
   <circle cx="1116" cy="240" r="3.5" fill="#64748b"/>
 
-  <text x="78" y="666" class="smallMeta">Replay orchestration stays central while provenance analysis, forgetting validation, and durable storage remain visually distinct for security benchmarking.</text>
+  <text x="78" y="666" style="font: 500 12px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #55667d;">Replay orchestration stays central while provenance analysis, forgetting validation, and durable storage remain visually distinct for security benchmarking.</text>
 </svg>
