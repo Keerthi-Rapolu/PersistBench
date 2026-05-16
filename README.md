@@ -371,10 +371,6 @@ PersistBench includes a 7-page read-only observability dashboard that queries th
 **Live Dashboard:** https://persistbench.streamlit.app/
 
 <p align="center">
-  <img src="docs/images/dashboard_hero.png" width="900" alt="Memory & Provenance — provenance lineage DAG with trust and toxicity evolution">
-</p>
-
-<p align="center">
   <a href="https://persistbench.streamlit.app/">
     <img src="docs/gifs/persistbench_demo.gif" width="900" alt="PersistBench dashboard walkthrough">
   </a>
