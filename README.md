@@ -384,15 +384,15 @@ graph LR
 
 ### Page Reference
 
-| Page | Preview |
+| Page | Primary focus |
 |---|---|
-| Overview | ![Overview](docs/images/overview.png) |
-| Attack Evolution | ![Attack Evolution](docs/images/attack_evolution.png) |
-| Memory & Provenance | ![Memory & Provenance](docs/images/memory_provenance.png) |
-| Defense & Metrics | ![Defense & Metrics](docs/images/defense_metrics.png) |
-| Cross-Run Comparison | ![Cross-Run Comparison](docs/images/cross_run.png) |
-| Artifacts & About | ![Artifacts & About](docs/images/artifacts.png) |
-| V3 Analysis | ![V3 Analysis](docs/images/v3_analysis.png) |
+| Overview | Run selector, core metric scorecards, attack lifecycle summary, all-runs comparison table |
+| Attack Evolution | Longitudinal fragment survival, trust decay curves, BDI trajectory, session composition breakdown |
+| Memory & Provenance | Provenance lineage, forgetting scorecard (FVS / RR / certification), per-test FVS audit table |
+| Defense & Metrics | Flag scatter plot (TP/FP), confidence calibration, defense latency, metric reference cards |
+| Cross-Run Comparison | Defense leaderboard, grouped bar charts, radar chart, utility-security tradeoff analysis |
+| Artifacts & About | In-memory export (CSV / JSON / Markdown / HTML), suite descriptions, citation block |
+| V3 Analysis | ConsolidationEngine timelines, archive resurrection events, semantic probing results |
 
 ### Overview
 
