@@ -33,7 +33,7 @@ def _resolve_db() -> str:
     for i, arg in enumerate(args):
         if arg == "--db" and i + 1 < len(args):
             return args[i + 1]
-    return str(_ROOT / "persistbench.duckdb")
+    return str(_ROOT / "demo.duckdb")
 
 
 def main():
