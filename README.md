@@ -71,7 +71,7 @@ The benchmark is designed for security researchers who need to evaluate memory-e
 
 ## Implementation Status
 
-### Fully Implemented
+### Core Implemented Components
 
 **Replay and Evaluation Infrastructure**
 - `ReplayEngine`: multi-session oracle replay with configurable session count, attack injection, probe sessions, and defense middleware hooks
@@ -113,6 +113,7 @@ The benchmark is designed for security researchers who need to evaluate memory-e
 - 27 SBMP scenarios across 7 domains (finance, healthcare, legal, HR, cybersecurity, education, software development)
 - 25 TSCC scenarios across 6 tool supply chain domains
 - 25 CACP scenarios covering 24 multi-agent pipeline contamination patterns
+- All 77 scenarios are fully specified (fragments, triggers, probe sessions, benign turns). The hosted demo database includes executed runs for a subset; full suite execution requires a local benchmark run.
 
 **Leaderboard and Export**
 - `LeaderboardExporter`: JSON, JSONL, CSV, Markdown export
@@ -720,15 +721,15 @@ If you use PersistBench in your research, please cite:
                   Cross-Session Adversarial Attacks Against Memory-Enabled {LLM} Agents},
   author       = {Rapolu, Keerthi},
   year         = {2026},
-  note         = {Research prototype. V4 core framework: defense ecosystem, extended metrics,
-                  governance pipeline, and 77-scenario evaluation suite.
+  note         = {Research prototype. 77-scenario evaluation suite with seven defense plugins,
+                  provenance-aware memory tracking, and trustworthy forgetting validation.
                   Available at \url{https://github.com/keerthi-rapolu/persistbench}},
 }
 ```
 
 **ACM-style reference:**
 
-Keerthi Rapolu. 2026. *PersistBench: A Reproducible Benchmark for Evaluating Persistent Cross-Session Adversarial Attacks Against Memory-Enabled LLM Agents.* Research prototype. V4 core framework. https://github.com/keerthi-rapolu/persistbench.
+Keerthi Rapolu. 2026. *PersistBench: A Reproducible Benchmark for Evaluating Persistent Cross-Session Adversarial Attacks Against Memory-Enabled LLM Agents.* Research prototype. https://github.com/keerthi-rapolu/persistbench.
 
 ---
 
