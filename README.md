@@ -380,22 +380,6 @@ PersistBench includes a 7-page read-only observability dashboard that queries th
   </a>
 </p>
 
-### Pages
-
-| Overview | Attack Evolution |
-|---|---|
-| ![](docs/images/page_overview.png) | ![](docs/images/page_attack_evolution.png) |
-
-| Memory & Provenance | Cross-Run Comparison |
-|---|---|
-| ![](docs/images/page_memory_and_provenance.png) | ![](docs/images/page_cross-run_comparison.png) |
-
-| Defense & Metrics | Artifacts & About |
-|---|---|
-| ![](docs/images/page_defense_and_metrics.png) | ![](docs/images/page_artifacts_and_about.png) |
-
-Pages support longitudinal attack analysis, provenance auditing, forgetting validation, defense comparison, and in-memory artifact export (CSV / JSON / Markdown / HTML).
-
 ### Workflow
 
 ```
