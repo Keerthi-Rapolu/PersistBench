@@ -368,6 +368,16 @@ PersistBench is not only a benchmark runner. It includes a research observabilit
 
 **Live Dashboard:** https://persistbench.streamlit.app/
 
+<p align="center">
+  <a href="https://persistbench.streamlit.app/">
+    <img src="docs/gifs/persistbench_demo.gif" width="900" alt="PersistBench dashboard walkthrough">
+  </a>
+</p>
+
+<p align="center">
+  <img src="docs/images/dashboard_hero.png" width="900" alt="Memory and Provenance — provenance lineage DAG with trust and toxicity evolution">
+</p>
+
 The dashboard is read-only. All pages issue analytical queries directly against a local or hosted DuckDB file. No external service, no streaming pipeline, and no cloud state are required — making it suitable for offline reproducible analysis.
 
 ### Dashboard Data Flow
@@ -385,15 +395,15 @@ graph LR
 
 ### Page Reference
 
-| Page | Primary focus |
-|---|---|
-| Overview | Run selector, core metric scorecards, attack lifecycle summary, all-runs comparison table |
-| Attack Evolution | Longitudinal fragment survival, trust decay curves, BDI trajectory, session composition breakdown |
-| Memory & Provenance | Provenance lineage, forgetting scorecard (FVS / RR / certification), per-test FVS audit table |
-| Defense & Metrics | Flag scatter plot (TP/FP), confidence calibration, defense latency, metric reference cards |
-| Cross-Run Comparison | Defense leaderboard, grouped bar charts, radar chart, utility-security tradeoff analysis |
-| Artifacts & About | In-memory export (CSV / JSON / Markdown / HTML), suite descriptions, citation block |
-| V3 Analysis | ConsolidationEngine timelines, archive resurrection events, semantic probing results |
+| Page | Screenshot | Primary focus |
+|---|---|---|
+| Overview | ![Overview](docs/images/page_overview.png) | Run selector, core metric scorecards, attack lifecycle summary, all-runs comparison table |
+| Attack Evolution | ![Attack Evolution](docs/images/page_attack_evolution.png) | Longitudinal fragment survival, trust decay curves, BDI trajectory, session composition breakdown |
+| Memory & Provenance | ![Memory & Provenance](docs/images/page_memory_and_provenance.png) | Provenance lineage, forgetting scorecard (FVS / RR / certification), per-test FVS audit table |
+| Defense & Metrics | ![Defense & Metrics](docs/images/page_defense_and_metrics.png) | Flag scatter plot (TP/FP), confidence calibration, defense latency, metric reference cards |
+| Cross-Run Comparison | ![Cross-Run Comparison](docs/images/page_cross-run_comparison.png) | Defense leaderboard, grouped bar charts, radar chart, utility-security tradeoff analysis |
+| Artifacts & About | ![Artifacts & About](docs/images/page_artifacts_and_about.png) | In-memory export (CSV / JSON / Markdown / HTML), suite descriptions, citation block |
+| V3 Analysis | — | ConsolidationEngine timelines, archive resurrection events, semantic probing results |
 
 ### Overview
 
