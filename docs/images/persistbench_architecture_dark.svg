@@ -142,8 +142,8 @@
       <text x="456" y="366" class="nodeMeta">probe, and trigger phases</text>
       <text x="456" y="381" class="smallMeta">deterministic traces, defense hooks,</text>
       <text x="456" y="394" class="smallMeta">session lifecycle control</text>
-      <rect x="544" y="401" width="136" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
-      <text x="572" y="417" class="chip">orchestrator</text>
+      <rect x="558" y="398" width="138" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
+      <text x="586" y="414" class="chip">orchestrator</text>
     </g>
 
     <g filter="url(#cardShadow)">
@@ -234,10 +234,10 @@
 
   <path class="connector" d="M256 511C316 511 362 376 432 350"/>
   <path class="connectorSoft" d="M600 270C600 280 600 286 600 296"/>
-  <path class="connectorSoft" d="M530 408C530 428 462 430 462 450"/>
-  <path class="connectorSoft" d="M670 408C670 428 664 430 660 446"/>
+  <path class="connectorSoft" d="M526 408C520 426 470 434 462 446"/>
+  <path class="connectorSoft" d="M684 408C686 424 674 432 664 446"/>
   <path class="connectorSoft" d="M532 491C546 491 558 491 572 491"/>
-  <path class="connectorSoft" d="M660 446C660 428 646 418 634 408"/>
+  <path class="connectorSoft" d="M664 446C668 430 656 418 646 408"/>
 
   <path class="connector" d="M754 350C826 348 850 248 900 236"/>
   <path class="connectorSoft" d="M754 350C842 356 864 324 900 324"/>
