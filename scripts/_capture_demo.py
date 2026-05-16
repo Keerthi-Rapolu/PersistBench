@@ -47,11 +47,21 @@ PAGES = [
 HERO_PAGE = "/memory_provenance"   # page to use for static hero
 
 
+HIDE_CSS = """
+    [data-testid="stDeployButton"]   { display: none !important; }
+    [data-testid="stToolbar"]        { display: none !important; }
+    [data-testid="stHeader"] button  { display: none !important; }
+    ._profileContainer_gzau3_53      { display: none !important; }
+"""
+
+
 def take_screenshot(page, url: str, scroll_y: int = 0) -> bytes:
-    """Navigate, wait for load, optional scroll, return PNG bytes."""
+    """Navigate, wait for load, hide Streamlit chrome, optional scroll, return PNG bytes."""
     page.goto(BASE_URL + url, wait_until="networkidle", timeout=20000)
     # Extra wait for Altair/Vega charts to render
     time.sleep(2.5)
+    # Hide Deploy button and toolbar before capturing
+    page.add_style_tag(content=HIDE_CSS)
     if scroll_y:
         page.evaluate(f"window.scrollTo(0, {scroll_y})")
         time.sleep(0.4)
