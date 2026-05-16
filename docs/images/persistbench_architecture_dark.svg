@@ -11,55 +11,64 @@
       <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1100 190) rotate(18) scale(320 220)">
-      <stop offset="0" stop-color="#ddd6fe" stop-opacity="0.32"/>
+      <stop offset="0" stop-color="#ddd6fe" stop-opacity="0.38"/>
       <stop offset="1" stop-color="#ddd6fe" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="glowC" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(720 700) rotate(90) scale(160 380)">
-      <stop offset="0" stop-color="#dbeafe" stop-opacity="0.26"/>
+      <stop offset="0" stop-color="#dbeafe" stop-opacity="0.31"/>
       <stop offset="1" stop-color="#dbeafe" stop-opacity="0"/>
     </radialGradient>
 
     <linearGradient id="inputPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fef3c7"/>
-      <stop offset="1" stop-color="#fde68a"/>
+      <stop offset="0" stop-color="#fff2bf"/>
+      <stop offset="1" stop-color="#f9df79"/>
     </linearGradient>
     <linearGradient id="tracePanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffe4e6"/>
-      <stop offset="1" stop-color="#fecdd3"/>
+      <stop offset="0" stop-color="#ffe1e5"/>
+      <stop offset="1" stop-color="#f8c5cf"/>
     </linearGradient>
     <linearGradient id="replayPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#dbeafe"/>
-      <stop offset="1" stop-color="#bfdbfe"/>
+      <stop offset="0" stop-color="#d7e8ff"/>
+      <stop offset="1" stop-color="#b8d4fb"/>
     </linearGradient>
     <linearGradient id="evalPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#dcfce7"/>
-      <stop offset="1" stop-color="#bbf7d0"/>
+      <stop offset="0" stop-color="#d9fae6"/>
+      <stop offset="1" stop-color="#b2f2cb"/>
     </linearGradient>
     <linearGradient id="outputPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ede9fe"/>
-      <stop offset="1" stop-color="#ddd6fe"/>
+      <stop offset="0" stop-color="#eee9ff"/>
+      <stop offset="1" stop-color="#d8cffd"/>
     </linearGradient>
 
     <filter id="panelShadow" x="-20%" y="-20%" width="140%" height="180%">
       <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#94a3b8" flood-opacity="0.14"/>
     </filter>
     <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="180%">
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#94a3b8" flood-opacity="0.11"/>
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#94a3b8" flood-opacity="0.10"/>
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#cbd5e1" flood-opacity="0.07"/>
     </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <filter id="focusShadow" x="-20%" y="-20%" width="140%" height="190%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#7aa2d8" flood-opacity="0.16"/>
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#cbd5e1" flood-opacity="0.08"/>
+    </filter>
+    <filter id="accentShadow" x="-20%" y="-20%" width="140%" height="190%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#94a3b8" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#d8dee9" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.3" refY="5" markerWidth="6.2" markerHeight="6.2" orient="auto-start-reverse">
       <path d="M0 0L10 5L0 10V0Z" fill="#64748b"/>
     </marker>
     <style>
       .title { font: 700 34px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0f172a; letter-spacing: -0.025em; }
-      .subtitle { font: 500 15px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #475569; letter-spacing: 0.01em; }
+      .subtitle { font: 500 15px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #415166; letter-spacing: 0.01em; }
       .section { font: 650 19px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0f172a; letter-spacing: -0.02em; }
-      .sectionMeta { font: 600 10px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #64748b; letter-spacing: 0.16em; text-transform: uppercase; }
+      .sectionMeta { font: 600 10px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #5c6c84; letter-spacing: 0.16em; text-transform: uppercase; }
       .nodeTitle { font: 650 16px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0f172a; letter-spacing: -0.015em; }
-      .nodeMeta { font: 500 12px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #475569; }
-      .smallMeta { font: 500 11px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #64748b; }
+      .nodeMeta { font: 500 12px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #415166; }
+      .smallMeta { font: 500 11px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #5b6b81; }
       .chip { font: 600 10px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #334155; letter-spacing: 0.08em; text-transform: uppercase; }
-      .connector { stroke: #64748b; stroke-width: 1.9; fill: none; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); opacity: 0.92; }
-      .connectorSoft { stroke: #94a3b8; stroke-width: 1.55; fill: none; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); opacity: 0.95; }
+      .connector { stroke: #64748b; stroke-width: 1.85; fill: none; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); opacity: 0.78; }
+      .connectorSoft { stroke: #64748b; stroke-width: 1.55; fill: none; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); opacity: 0.54; }
       .mutedLine { stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 1.35; }
     </style>
   </defs>
@@ -73,20 +82,20 @@
   <text x="78" y="95" class="subtitle">Longitudinal replay pipeline for persistent cross-session adversarial evaluation</text>
 
   <g filter="url(#panelShadow)">
-    <rect x="60" y="120" width="246" height="250" rx="22" fill="url(#inputPanel)" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.92"/>
+    <rect x="60" y="120" width="246" height="250" rx="22" fill="url(#inputPanel)" fill-opacity="0.90" stroke="#ffffff" stroke-opacity="0.94"/>
     <text x="84" y="150" class="sectionMeta">Stage 1</text>
     <text x="84" y="176" class="section">Input</text>
     <path d="M84 188H284" class="mutedLine"/>
 
     <g filter="url(#cardShadow)">
-      <rect x="78" y="204" width="146" height="58" rx="16" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
+      <rect x="78" y="204" width="146" height="58" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="94" y="227" class="nodeTitle">Scenario YAML</text>
       <text x="94" y="245" class="nodeMeta">attack fragments, trigger turns</text>
       <text x="94" y="257" class="smallMeta">suite metadata and timing plan</text>
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="78" y="274" width="146" height="58" rx="16" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
+      <rect x="78" y="274" width="146" height="58" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="94" y="297" class="nodeTitle">Seed / RNG</text>
       <text x="94" y="315" class="nodeMeta">deterministic replay control</text>
       <text x="94" y="327" class="smallMeta">reproducible trace generation</text>
@@ -94,13 +103,13 @@
   </g>
 
   <g filter="url(#panelShadow)">
-    <rect x="60" y="398" width="246" height="170" rx="22" fill="url(#tracePanel)" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.92"/>
+    <rect x="60" y="398" width="246" height="170" rx="22" fill="url(#tracePanel)" fill-opacity="0.90" stroke="#ffffff" stroke-opacity="0.94"/>
     <text x="84" y="428" class="sectionMeta">Stage 2</text>
     <text x="84" y="454" class="section">Trace Generation</text>
     <path d="M84 466H284" class="mutedLine"/>
 
     <g filter="url(#cardShadow)">
-      <rect x="78" y="480" width="150" height="58" rx="16" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
+      <rect x="78" y="480" width="150" height="58" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="94" y="504" class="nodeTitle">SLIS Generator</text>
       <text x="94" y="522" class="nodeMeta">session-level injection</text>
       <text x="94" y="534" class="smallMeta">sequencer</text>
@@ -108,13 +117,13 @@
   </g>
 
   <g filter="url(#panelShadow)">
-    <rect x="344" y="114" width="500" height="530" rx="24" fill="url(#replayPanel)" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.94"/>
+    <rect x="344" y="114" width="500" height="530" rx="24" fill="url(#replayPanel)" fill-opacity="0.91" stroke="#ffffff" stroke-opacity="0.96"/>
     <text x="370" y="146" class="sectionMeta">Stage 3</text>
     <text x="370" y="172" class="section">Replay Engine</text>
     <path d="M370 184H820" class="mutedLine"/>
 
     <g filter="url(#cardShadow)">
-      <rect x="372" y="204" width="456" height="66" rx="18" fill="#ffffff" fill-opacity="0.76" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="372" y="204" width="456" height="66" rx="18" fill="#ffffff" fill-opacity="0.80" stroke="#ffffff" stroke-opacity="0.97"/>
       <text x="392" y="229" class="nodeTitle">Defense Middleware</text>
       <text x="392" y="247" class="nodeMeta">PLS, MW, TOH, DEV, PS, CD</text>
       <text x="392" y="259" class="smallMeta">pre-turn, post-turn, and memory-write interception</text>
@@ -122,19 +131,19 @@
       <text x="758" y="230" class="chip">control</text>
     </g>
 
-    <g filter="url(#cardShadow)">
-      <rect x="430" y="296" width="330" height="110" rx="22" fill="#ffffff" fill-opacity="0.8" stroke="#ffffff" stroke-opacity="0.98"/>
+    <g filter="url(#focusShadow)">
+      <rect x="424" y="288" width="342" height="122" rx="22" fill="#ffffff" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.99"/>
       <text x="456" y="331" class="nodeTitle">ReplayEngine</text>
       <text x="456" y="352" class="nodeMeta">multi-session orchestration across attack,</text>
       <text x="456" y="366" class="nodeMeta">probe, and trigger phases</text>
       <text x="456" y="381" class="smallMeta">deterministic traces, defense hooks,</text>
       <text x="456" y="394" class="smallMeta">session lifecycle control</text>
-      <rect x="624" y="374" width="116" height="24" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+      <rect x="624" y="375" width="116" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
       <text x="648" y="390" class="chip">orchestrator</text>
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="392" y="454" width="144" height="86" rx="18" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
+      <rect x="392" y="454" width="144" height="86" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="410" y="487" class="nodeTitle">Agent Backend</text>
       <text x="410" y="507" class="nodeMeta">Echo, Claude, OpenAI</text>
       <text x="410" y="521" class="smallMeta">oracle and live-model</text>
@@ -142,7 +151,7 @@
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="586" y="454" width="160" height="86" rx="18" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
+      <rect x="586" y="454" width="160" height="86" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="604" y="487" class="nodeTitle">Memory Store</text>
       <text x="604" y="507" class="nodeMeta">DuckDB, Qdrant</text>
       <text x="604" y="521" class="smallMeta">persistent state and</text>
@@ -151,21 +160,21 @@
   </g>
 
   <g filter="url(#panelShadow)">
-    <rect x="882" y="120" width="252" height="236" rx="22" fill="url(#evalPanel)" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.92"/>
+    <rect x="882" y="120" width="252" height="246" rx="22" fill="url(#evalPanel)" fill-opacity="0.89" stroke="#ffffff" stroke-opacity="0.94"/>
     <text x="906" y="150" class="sectionMeta">Stage 4</text>
     <text x="906" y="176" class="section">Evaluation</text>
     <path d="M906 188H1110" class="mutedLine"/>
 
     <g filter="url(#cardShadow)">
-      <rect x="900" y="204" width="216" height="64" rx="18" fill="#ffffff" fill-opacity="0.76" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="900" y="206" width="216" height="66" rx="18" fill="#ffffff" fill-opacity="0.80" stroke="#ffffff" stroke-opacity="0.97"/>
       <text x="920" y="229" class="nodeTitle">Metrics Computation</text>
       <text x="920" y="247" class="nodeMeta">APS, RLS, UPS, BDI, FVS, CRA</text>
       <rect x="920" y="252" width="82" height="18" rx="9" fill="#f0fdf4" stroke="#bbf7d0"/>
       <text x="939" y="265" class="chip">analysis</text>
     </g>
 
-    <g filter="url(#cardShadow)">
-      <rect x="900" y="282" width="216" height="62" rx="18" fill="#ffffff" fill-opacity="0.8" stroke="#ffffff" stroke-opacity="0.98"/>
+    <g filter="url(#accentShadow)">
+      <rect x="900" y="288" width="216" height="64" rx="18" fill="#ffffff" fill-opacity="0.84" stroke="#9ee5c1" stroke-opacity="0.75"/>
       <text x="920" y="307" class="nodeTitle">Provenance DAG</text>
       <text x="920" y="325" class="nodeMeta">ancestor and descendant</text>
       <text x="920" y="339" class="nodeMeta">lineage tracing</text>
@@ -173,28 +182,28 @@
   </g>
 
   <g filter="url(#panelShadow)">
-    <rect x="882" y="382" width="252" height="186" rx="22" fill="url(#evalPanel)" fill-opacity="0.8" stroke="#ffffff" stroke-opacity="0.92"/>
-    <text x="906" y="412" class="sectionMeta">Stage 4b</text>
-    <text x="906" y="438" class="section">Forgetting Validation</text>
-    <path d="M906 450H1110" class="mutedLine"/>
+    <rect x="882" y="376" width="252" height="198" rx="22" fill="url(#evalPanel)" fill-opacity="0.86" stroke="#ffffff" stroke-opacity="0.94"/>
+    <text x="906" y="406" class="sectionMeta">Stage 4b</text>
+    <text x="906" y="432" class="section">Forgetting Validation</text>
+    <path d="M906 444H1110" class="mutedLine"/>
 
-    <g filter="url(#cardShadow)">
-      <rect x="900" y="468" width="216" height="70" rx="20" fill="#ffffff" fill-opacity="0.82" stroke="#ffffff" stroke-opacity="0.98"/>
-      <text x="920" y="495" class="nodeTitle">ForgettingValidator</text>
-      <text x="920" y="514" class="nodeMeta">FVS-1 through FVS-15</text>
-      <text x="920" y="527" class="smallMeta">deletion completeness and</text>
-      <text x="920" y="539" class="smallMeta">resurfacing checks</text>
+    <g filter="url(#accentShadow)">
+      <rect x="900" y="462" width="216" height="76" rx="20" fill="#ffffff" fill-opacity="0.85" stroke="#92dec0" stroke-opacity="0.78"/>
+      <text x="920" y="490" class="nodeTitle">ForgettingValidator</text>
+      <text x="920" y="509" class="nodeMeta">FVS-1 through FVS-15</text>
+      <text x="920" y="523" class="smallMeta">deletion completeness and</text>
+      <text x="920" y="536" class="smallMeta">resurfacing checks</text>
     </g>
   </g>
 
   <g filter="url(#panelShadow)">
-    <rect x="1170" y="158" width="214" height="410" rx="22" fill="url(#outputPanel)" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.92"/>
+    <rect x="1170" y="152" width="214" height="424" rx="22" fill="url(#outputPanel)" fill-opacity="0.89" stroke="#ffffff" stroke-opacity="0.94"/>
     <text x="1194" y="188" class="sectionMeta">Stage 5</text>
     <text x="1194" y="214" class="section">Output</text>
     <path d="M1194 226H1358" class="mutedLine"/>
 
-    <g filter="url(#cardShadow)">
-      <rect x="1192" y="242" width="170" height="120" rx="20" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+    <g filter="url(#accentShadow)">
+      <rect x="1192" y="244" width="170" height="122" rx="20" fill="#ffffff" fill-opacity="0.83" stroke="#c7b6ff" stroke-opacity="0.82"/>
       <ellipse cx="1277" cy="268" rx="36" ry="9" fill="#ede9fe" stroke="#c4b5fd"/>
       <path d="M1241 268V330C1241 335 1257 340 1277 340C1297 340 1313 335 1313 330V268" stroke="#a78bfa" fill="none"/>
       <text x="1252" y="294" class="nodeTitle">DuckDB</text>
@@ -202,43 +211,43 @@
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="1192" y="384" width="170" height="68" rx="18" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
-      <text x="1210" y="411" class="nodeTitle">Artifact Export</text>
-      <text x="1210" y="430" class="nodeMeta">JSON, CSV, HTML, MD</text>
+      <rect x="1192" y="392" width="170" height="72" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <text x="1210" y="420" class="nodeTitle">Artifact Export</text>
+      <text x="1210" y="439" class="nodeMeta">JSON, CSV, HTML, MD</text>
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="1192" y="474" width="170" height="68" rx="18" fill="#ffffff" fill-opacity="0.74" stroke="#ffffff" stroke-opacity="0.94"/>
-      <text x="1210" y="501" class="nodeTitle">Dashboard</text>
-      <text x="1210" y="520" class="nodeMeta">7-page Streamlit</text>
-      <text x="1210" y="533" class="smallMeta">observability</text>
+      <rect x="1192" y="484" width="170" height="76" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <text x="1210" y="513" class="nodeTitle">Dashboard</text>
+      <text x="1210" y="532" class="nodeMeta">7-page Streamlit</text>
+      <text x="1210" y="545" class="smallMeta">observability</text>
     </g>
   </g>
 
-  <path class="connectorSoft" d="M224 233C294 233 318 332 318 466"/>
-  <path class="connectorSoft" d="M224 303C288 303 312 374 318 466"/>
-  <path class="connector" d="M318 466C318 494 300 509 228 509"/>
+  <path class="connectorSoft" d="M224 233C278 242 306 326 318 466"/>
+  <path class="connectorSoft" d="M224 303C276 314 304 382 318 466"/>
+  <path class="connector" d="M318 466C318 492 292 509 228 509"/>
 
-  <path class="connector" d="M228 509C300 509 336 350 430 350"/>
-  <path class="connectorSoft" d="M600 270C600 284 600 284 600 296"/>
-  <path class="connectorSoft" d="M532 406C532 430 464 430 464 454"/>
-  <path class="connectorSoft" d="M658 406C658 430 666 430 666 454"/>
-  <path class="connectorSoft" d="M536 497C556 497 566 497 586 497"/>
-  <path class="connectorSoft" d="M666 454C666 432 636 422 620 406"/>
+  <path class="connector" d="M228 509C292 509 340 368 424 351"/>
+  <path class="connectorSoft" d="M600 270C600 280 600 286 600 296"/>
+  <path class="connectorSoft" d="M532 410C532 432 464 434 464 454"/>
+  <path class="connectorSoft" d="M658 410C658 432 666 434 666 454"/>
+  <path class="connectorSoft" d="M536 497C554 497 568 497 586 497"/>
+  <path class="connectorSoft" d="M666 454C666 432 638 423 624 410"/>
 
-  <path class="connector" d="M760 350C844 350 858 236 900 236"/>
-  <path class="connectorSoft" d="M760 350C846 350 860 313 900 313"/>
-  <path class="connectorSoft" d="M760 350C854 350 872 503 900 503"/>
+  <path class="connector" d="M766 350C840 350 860 248 900 238"/>
+  <path class="connectorSoft" d="M766 350C844 350 862 319 900 319"/>
+  <path class="connectorSoft" d="M766 350C850 350 874 490 900 498"/>
 
-  <path class="connector" d="M1116 236C1152 236 1164 276 1192 276"/>
-  <path class="connectorSoft" d="M1116 313C1152 313 1164 292 1192 292"/>
-  <path class="connectorSoft" d="M1116 503C1160 503 1168 308 1192 308"/>
-  <path class="connectorSoft" d="M1277 362C1277 374 1277 374 1277 384"/>
-  <path class="connectorSoft" d="M1277 452C1277 464 1277 464 1277 474"/>
+  <path class="connector" d="M1116 238C1150 242 1172 272 1192 278"/>
+  <path class="connectorSoft" d="M1116 320C1152 320 1170 298 1192 296"/>
+  <path class="connectorSoft" d="M1116 500C1162 500 1176 314 1192 314"/>
+  <path class="connectorSoft" d="M1277 366C1277 376 1277 382 1277 392"/>
+  <path class="connectorSoft" d="M1277 464C1277 472 1277 476 1277 484"/>
 
   <circle cx="318" cy="466" r="3.5" fill="#64748b"/>
-  <circle cx="760" cy="350" r="3.5" fill="#64748b"/>
-  <circle cx="1116" cy="236" r="3.5" fill="#64748b"/>
+  <circle cx="766" cy="350" r="3.5" fill="#64748b"/>
+  <circle cx="1116" cy="238" r="3.5" fill="#64748b"/>
 
   <text x="78" y="758" class="smallMeta">Replay orchestration stays central while provenance analysis, forgetting validation, and durable storage remain visually distinct for security benchmarking.</text>
 </svg>
