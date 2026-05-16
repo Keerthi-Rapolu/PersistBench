@@ -1,8 +1,8 @@
-<svg width="1460" height="820" viewBox="0 0 1460 820" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg width="1460" height="710" viewBox="0 0 1460 710" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">PersistBench architecture diagram</title>
   <desc id="desc">Pastel research-paper architecture figure showing input, trace generation, replay orchestration, evaluation, forgetting validation, and output components for PersistBench.</desc>
   <defs>
-    <linearGradient id="bg" x1="80" y1="60" x2="1380" y2="760" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="80" y1="60" x2="1380" y2="650" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f8fafc"/>
       <stop offset="1" stop-color="#eef2ff"/>
     </linearGradient>
@@ -14,7 +14,7 @@
       <stop offset="0" stop-color="#ddd6fe" stop-opacity="0.38"/>
       <stop offset="1" stop-color="#ddd6fe" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="glowC" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(720 700) rotate(90) scale(160 380)">
+    <radialGradient id="glowC" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(720 610) rotate(90) scale(130 340)">
       <stop offset="0" stop-color="#dbeafe" stop-opacity="0.31"/>
       <stop offset="1" stop-color="#dbeafe" stop-opacity="0"/>
     </radialGradient>
@@ -39,6 +39,10 @@
       <stop offset="0" stop-color="#eee9ff"/>
       <stop offset="1" stop-color="#d8cffd"/>
     </linearGradient>
+    <linearGradient id="duckdbCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#faf7ff"/>
+      <stop offset="1" stop-color="#efe6ff"/>
+    </linearGradient>
 
     <filter id="panelShadow" x="-20%" y="-20%" width="140%" height="180%">
       <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#94a3b8" flood-opacity="0.14"/>
@@ -60,9 +64,9 @@
     </marker>
     <style>
       .title { font: 700 34px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0f172a; letter-spacing: -0.025em; }
-      .subtitle { font: 500 15px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #415166; letter-spacing: 0.01em; }
+      .subtitle { font: 450 15px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #54647a; letter-spacing: 0.01em; }
       .section { font: 650 19px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0f172a; letter-spacing: -0.02em; }
-      .sectionMeta { font: 600 10px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #5c6c84; letter-spacing: 0.16em; text-transform: uppercase; }
+      .sectionMeta { font: 600 10px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #4f617a; letter-spacing: 0.16em; text-transform: uppercase; }
       .nodeTitle { font: 650 16px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0f172a; letter-spacing: -0.015em; }
       .nodeMeta { font: 500 12px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #415166; }
       .smallMeta { font: 500 11px 'Inter', 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #5b6b81; }
@@ -73,10 +77,10 @@
     </style>
   </defs>
 
-  <rect width="1460" height="820" rx="28" fill="url(#bg)"/>
+  <rect width="1460" height="710" rx="28" fill="url(#bg)"/>
   <ellipse cx="320" cy="160" rx="300" ry="220" fill="url(#glowA)"/>
   <ellipse cx="1100" cy="190" rx="320" ry="220" fill="url(#glowB)"/>
-  <ellipse cx="720" cy="700" rx="380" ry="160" fill="url(#glowC)"/>
+  <ellipse cx="720" cy="610" rx="340" ry="130" fill="url(#glowC)"/>
 
   <text x="78" y="68" class="title">PersistBench Architecture</text>
   <text x="78" y="95" class="subtitle">Longitudinal replay pipeline for persistent cross-session adversarial evaluation</text>
@@ -117,33 +121,33 @@
   </g>
 
   <g filter="url(#panelShadow)">
-    <rect x="344" y="114" width="500" height="530" rx="24" fill="url(#replayPanel)" fill-opacity="0.91" stroke="#ffffff" stroke-opacity="0.96"/>
-    <text x="370" y="146" class="sectionMeta">Stage 3</text>
-    <text x="370" y="172" class="section">Replay Engine</text>
-    <path d="M370 184H820" class="mutedLine"/>
+    <rect x="360" y="114" width="468" height="516" rx="24" fill="url(#replayPanel)" fill-opacity="0.91" stroke="#ffffff" stroke-opacity="0.96"/>
+    <text x="384" y="146" class="sectionMeta">Stage 3</text>
+    <text x="384" y="172" class="section">Replay Engine</text>
+    <path d="M384 184H804" class="mutedLine"/>
 
     <g filter="url(#cardShadow)">
-      <rect x="372" y="204" width="456" height="66" rx="18" fill="#ffffff" fill-opacity="0.80" stroke="#ffffff" stroke-opacity="0.97"/>
+      <rect x="384" y="204" width="420" height="66" rx="18" fill="#ffffff" fill-opacity="0.80" stroke="#ffffff" stroke-opacity="0.97"/>
       <text x="392" y="229" class="nodeTitle">Defense Middleware</text>
       <text x="392" y="247" class="nodeMeta">PLS, MW, TOH, DEV, PS, CD</text>
       <text x="392" y="259" class="smallMeta">pre-turn, post-turn, and memory-write interception</text>
-      <rect x="744" y="216" width="66" height="20" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#dbeafe"/>
-      <text x="758" y="230" class="chip">control</text>
+      <rect x="720" y="216" width="66" height="20" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#dbeafe"/>
+      <text x="734" y="230" class="chip">control</text>
     </g>
 
     <g filter="url(#focusShadow)">
-      <rect x="424" y="288" width="342" height="122" rx="22" fill="#ffffff" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.99"/>
+      <rect x="432" y="292" width="322" height="116" rx="22" fill="#ffffff" fill-opacity="0.84" stroke="#ffffff" stroke-opacity="0.99"/>
       <text x="456" y="331" class="nodeTitle">ReplayEngine</text>
       <text x="456" y="352" class="nodeMeta">multi-session orchestration across attack,</text>
       <text x="456" y="366" class="nodeMeta">probe, and trigger phases</text>
       <text x="456" y="381" class="smallMeta">deterministic traces, defense hooks,</text>
       <text x="456" y="394" class="smallMeta">session lifecycle control</text>
-      <rect x="624" y="375" width="116" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
-      <text x="648" y="390" class="chip">orchestrator</text>
+      <rect x="606" y="374" width="112" height="24" rx="12" fill="#eef5ff" stroke="#aacaf6"/>
+      <text x="629" y="390" class="chip">orchestrator</text>
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="392" y="454" width="144" height="86" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="392" y="450" width="140" height="82" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="410" y="487" class="nodeTitle">Agent Backend</text>
       <text x="410" y="507" class="nodeMeta">Echo, Claude, OpenAI</text>
       <text x="410" y="521" class="smallMeta">oracle and live-model</text>
@@ -151,7 +155,7 @@
     </g>
 
     <g filter="url(#cardShadow)">
-      <rect x="586" y="454" width="160" height="86" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
+      <rect x="572" y="450" width="154" height="82" rx="18" fill="#ffffff" fill-opacity="0.78" stroke="#ffffff" stroke-opacity="0.96"/>
       <text x="604" y="487" class="nodeTitle">Memory Store</text>
       <text x="604" y="507" class="nodeMeta">DuckDB, Qdrant</text>
       <text x="604" y="521" class="smallMeta">persistent state and</text>
@@ -203,7 +207,7 @@
     <path d="M1194 226H1358" class="mutedLine"/>
 
     <g filter="url(#accentShadow)">
-      <rect x="1192" y="244" width="170" height="122" rx="20" fill="#ffffff" fill-opacity="0.83" stroke="#c7b6ff" stroke-opacity="0.82"/>
+      <rect x="1192" y="244" width="170" height="122" rx="20" fill="url(#duckdbCard)" fill-opacity="0.92" stroke="#baa7ff" stroke-opacity="0.9"/>
       <ellipse cx="1277" cy="268" rx="36" ry="9" fill="#ede9fe" stroke="#c4b5fd"/>
       <path d="M1241 268V330C1241 335 1257 340 1277 340C1297 340 1313 335 1313 330V268" stroke="#a78bfa" fill="none"/>
       <text x="1252" y="294" class="nodeTitle">DuckDB</text>
@@ -228,26 +232,26 @@
   <path class="connectorSoft" d="M254 309C300 320 322 384 334 466"/>
   <path class="connector" d="M334 466C334 492 308 511 256 511"/>
 
-  <path class="connector" d="M256 511C304 511 344 370 424 351"/>
+  <path class="connector" d="M256 511C316 511 362 376 432 350"/>
   <path class="connectorSoft" d="M600 270C600 280 600 286 600 296"/>
-  <path class="connectorSoft" d="M532 410C532 432 464 434 464 454"/>
-  <path class="connectorSoft" d="M658 410C658 432 666 434 666 454"/>
-  <path class="connectorSoft" d="M536 497C554 497 568 497 586 497"/>
-  <path class="connectorSoft" d="M666 454C666 432 638 423 624 410"/>
+  <path class="connectorSoft" d="M530 408C530 428 462 430 462 450"/>
+  <path class="connectorSoft" d="M656 408C656 428 648 430 648 450"/>
+  <path class="connectorSoft" d="M532 491C546 491 558 491 572 491"/>
+  <path class="connectorSoft" d="M648 450C648 430 624 420 610 408"/>
 
-  <path class="connector" d="M766 350C840 350 860 248 900 238"/>
-  <path class="connectorSoft" d="M766 350C844 350 862 319 900 319"/>
-  <path class="connectorSoft" d="M766 350C850 350 874 490 900 498"/>
+  <path class="connector" d="M754 350C836 350 860 250 900 240"/>
+  <path class="connectorSoft" d="M754 350C838 350 862 320 900 320"/>
+  <path class="connectorSoft" d="M754 350C848 350 876 488 900 498"/>
 
-  <path class="connector" d="M1116 238C1150 242 1172 272 1192 278"/>
-  <path class="connectorSoft" d="M1116 320C1152 320 1170 298 1192 296"/>
-  <path class="connectorSoft" d="M1116 500C1162 500 1176 314 1192 314"/>
+  <path class="connector" d="M1116 240C1148 246 1166 264 1192 284"/>
+  <path class="connectorSoft" d="M1116 320C1148 320 1168 306 1192 306"/>
+  <path class="connectorSoft" d="M1116 500C1154 500 1172 338 1192 326"/>
   <path class="connectorSoft" d="M1277 366C1277 376 1277 382 1277 392"/>
   <path class="connectorSoft" d="M1277 464C1277 472 1277 476 1277 484"/>
 
   <circle cx="334" cy="466" r="3.5" fill="#64748b"/>
-  <circle cx="766" cy="350" r="3.5" fill="#64748b"/>
-  <circle cx="1116" cy="238" r="3.5" fill="#64748b"/>
+  <circle cx="754" cy="350" r="3.5" fill="#64748b"/>
+  <circle cx="1116" cy="240" r="3.5" fill="#64748b"/>
 
-  <text x="78" y="758" class="smallMeta">Replay orchestration stays central while provenance analysis, forgetting validation, and durable storage remain visually distinct for security benchmarking.</text>
+  <text x="78" y="666" class="smallMeta">Replay orchestration stays central while provenance analysis, forgetting validation, and durable storage remain visually distinct for security benchmarking.</text>
 </svg>
