@@ -366,12 +366,12 @@ These tests require V3 optional backends. When backends are absent, the test rec
 
 ## Research Observability Dashboard
 
-PersistBench is not only a benchmark runner. It includes a research observability system designed as a forensic and analytical interface for persistent agent security evaluation. The dashboard surfaces longitudinal attack evolution, provenance chain lineage, forgetting validation outcomes, defense behavior under adversarial pressure, cross-run comparisons, and behavioral drift trajectories — all derived directly from the DuckDB analytical store without an external telemetry service.
+PersistBench includes a 7-page read-only observability dashboard that queries the DuckDB analytical store directly. It visualizes longitudinal attack evolution, provenance chain lineage, forgetting validation outcomes, and defense behavior across runs — without requiring an external telemetry service. All results are reproducible from the benchmark database file.
 
 **Live Dashboard:** https://persistbench.streamlit.app/
 
 <p align="center">
-  <img src="docs/images/dashboard_hero.png" width="900" alt="Memory and Provenance — provenance lineage DAG with trust and toxicity evolution">
+  <img src="docs/images/dashboard_hero.png" width="900" alt="Memory & Provenance — provenance lineage DAG with trust and toxicity evolution">
 </p>
 
 <p align="center">
@@ -380,91 +380,27 @@ PersistBench is not only a benchmark runner. It includes a research observabilit
   </a>
 </p>
 
-The dashboard is read-only. All pages issue analytical queries directly against a local or hosted DuckDB file. No external service, no streaming pipeline, and no cloud state are required — making it suitable for offline reproducible analysis.
+### Pages
 
-### Dashboard Data Flow
+| Overview | Attack Evolution |
+|---|---|
+| ![](docs/images/page_overview.png) | ![](docs/images/page_attack_evolution.png) |
 
-```mermaid
-graph LR
-    DB[(DuckDB\nAnalytical Store)]
-    Q[Analytical Query Layer\npersistbench/db/queries.py]
-    A[Dashboard Adapters\nper-page data transformations]
-    V[Visualization Layer\nAltair · Matplotlib · Streamlit]
-    U[Streamlit UI\n7 pages]
+| Memory & Provenance | Cross-Run Comparison |
+|---|---|
+| ![](docs/images/page_memory_and_provenance.png) | ![](docs/images/page_cross-run_comparison.png) |
 
-    DB --> Q --> A --> V --> U
+| Defense & Metrics | Artifacts & About |
+|---|---|
+| ![](docs/images/page_defense_and_metrics.png) | ![](docs/images/page_artifacts_and_about.png) |
+
+Pages support longitudinal attack analysis, provenance auditing, forgetting validation, defense comparison, and in-memory artifact export (CSV / JSON / Markdown / HTML).
+
+### Workflow
+
 ```
-
-### Page Reference
-
-| Page | Screenshot | Primary focus |
-|---|---|---|
-| Overview | ![Overview](docs/images/page_overview.png) | Run selector, core metric scorecards, attack lifecycle summary, all-runs comparison table |
-| Attack Evolution | ![Attack Evolution](docs/images/page_attack_evolution.png) | Longitudinal fragment survival, trust decay curves, BDI trajectory, session composition breakdown |
-| Memory & Provenance | ![Memory & Provenance](docs/images/page_memory_and_provenance.png) | Provenance lineage, forgetting scorecard (FVS / RR / certification), per-test FVS audit table |
-| Defense & Metrics | ![Defense & Metrics](docs/images/page_defense_and_metrics.png) | Flag scatter plot (TP/FP), confidence calibration, defense latency, metric reference cards |
-| Cross-Run Comparison | ![Cross-Run Comparison](docs/images/page_cross-run_comparison.png) | Defense leaderboard, grouped bar charts, radar chart, utility-security tradeoff analysis |
-| Artifacts & About | ![Artifacts & About](docs/images/page_artifacts_and_about.png) | In-memory export (CSV / JSON / Markdown / HTML), suite descriptions, citation block |
-| V3 Analysis | *dynamic — content varies by V3 backend configuration* | ConsolidationEngine timelines, archive resurrection events, semantic probing results |
-
-### Overview
-
-**Analytical question:** Which runs are in the database, and what is the high-level security posture of each?
-
-Run selector with deduplication, core metric scorecards (APS, RLS, UPS, Composite), attack lifecycle summary (fragment count, injection sessions, dormancy window, trigger session, probe sessions), and an all-runs comparison table ranked by Composite score. Researchers can identify at a glance which defense configurations suppressed persistence and which allowed fragments to survive to the trigger session.
-
-### Attack Evolution
-
-**Analytical question:** How did adversarial fragments propagate and persist across sessions, and when did behavioral drift emerge?
-
-Longitudinal hero chart displaying fragment survival fraction over time, per-fragment trust decay curves, and BDI readings at each probe session. Tab 2 shows session-level turn composition (benign, adversarial, probe) as a stacked breakdown. Tab 3 plots the APS survival curve and BDI trajectory side-by-side, allowing researchers to correlate dormancy phases with trust decay and identify the exact session at which behavioral drift crossed a detectable threshold.
-
-### Memory & Provenance
-
-**Analytical question:** What is the provenance lineage of each adversarial fragment, and was deletion forensically complete?
-
-Fragment provenance cards with per-entry trust and toxicity scores, provenance chain visualization with BFS ancestor/descendant traversal, and a trustworthy forgetting scorecard reporting FVS, Resurfacing Rate, and certification status. The per-test FVS results table distinguishes genuinely passed, skipped (absent backend), and failed tests — allowing researchers to audit deletion completeness across primary store, archive, consolidation, semantic, and embedding resurfacing pathways. A low FVS score for a NoDefense run indicates the attack was effective, not that the system malfunctioned.
-
-### Defense & Metrics
-
-**Analytical question:** How precisely did the defense discriminate adversarial from benign content, and how confident was it?
-
-Defense flag scatter plot with confidence on the y-axis and session index on the x-axis, with flags classified as true positive (adversarial fragment flagged) or false positive (benign turn flagged). Researchers can inspect confidence calibration, identify sessions with elevated false positive rates, and assess defense latency — the gap between when a fragment was injected and when the defense first flagged it. Metric reference cards define APS, RLS, UPS, Composite, BDI, FVS, and CRA with honest scope notes on heuristic approximations.
-
-### Cross-Run Comparison
-
-**Analytical question:** Across all defense configurations evaluated, which achieves the best utility-security tradeoff?
-
-Side-by-side grouped bar charts comparing all runs on four dimensions: Persistence Resistance (1−APS), Recovery Speed (1−RLS), Utility Preservation (UPS), and Composite score. A defense radar chart provides a compact multi-axis view. The ranked leaderboard table supports filtering by suite, defense name, and model. Researchers can identify configurations that suppress persistence without incurring utility cost, and detect cases where high Composite scores mask poor recovery latency.
-
-### Artifacts & About
-
-**Analytical question:** How do I export benchmark results for external analysis or paper submission?
-
-In-memory export of benchmark results in CSV, JSON, Markdown, and HTML formats with no intermediate files required. Benchmark suite descriptions and citation block. All exports are generated from the live DuckDB connection and reflect the currently selected run.
-
-### V3 Analysis
-
-**Analytical question:** What did the optional V3 backends (ConsolidationEngine, ArchiveManager, SemanticPersistenceProber) contribute to memory behavior?
-
-V3-specific analytical views for consolidation event timelines, archive access and resurrection events, and semantic drift probing results. Only populated when V3 backend runs are present in the database.
-
-### Typical Research Workflow
-
-1. Run benchmark against one or more scenarios and defenses — results stored in `bench.duckdb`
-2. Launch dashboard locally: `streamlit run persistbench/dashboard/app.py -- --db bench.duckdb`
-3. Select a run in the Overview page to load its metrics and lifecycle summary
-4. Navigate to Attack Evolution to inspect dormancy, trust decay, and BDI trajectory
-5. Navigate to Memory & Provenance to audit provenance chains and verify deletion completeness
-6. Navigate to Defense & Metrics to evaluate flag precision and confidence calibration
-7. Navigate to Cross-Run Comparison to rank defenses and identify tradeoffs
-8. Export reproducible artifacts from Artifacts & About for paper submission or archival
-
-For rapid inspection without a local benchmark run, use the hosted dashboard pre-loaded with seven defense configurations evaluated against `sbmp-001`:
-
-**https://persistbench.streamlit.app/**
-
-To launch locally:
+run benchmark → inspect provenance → validate forgetting → compare defenses → export artifacts
+```
 
 ```bash
 streamlit run persistbench/dashboard/app.py -- --db bench.duckdb
