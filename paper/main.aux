@@ -1,0 +1,174 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{Abstract}{1}{section*.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{1}{1}{Introduction}{section.1}{}}
+\citation{liang2023helm}
+\citation{mazeika2024harmbench}
+\citation{liu2024agentbench}
+\citation{qin2023toolllm}
+\citation{jimenez2024swebench}
+\citation{zhu2024promptbench}
+\citation{greshake2023indirect}
+\citation{yi2025bipia}
+\citation{hines2024spotlighting}
+\citation{debenedetti2024agentdojo}
+\citation{chen2024agentpoison}
+\citation{dong2025minja}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background and Related Work}{2}{section.2}\protected@file@percent }
+\newlabel{sec:background-related}{{2}{2}{Background and Related Work}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Agent Benchmarking Frameworks}{2}{subsection.2.1}\protected@file@percent }
+\newlabel{subsec:rw-agent-benchmarks}{{2.1}{2}{Agent Benchmarking Frameworks}{subsection.2.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Prompt Injection and Agent Security}{2}{subsection.2.2}\protected@file@percent }
+\newlabel{subsec:rw-prompt-injection}{{2.2}{2}{Prompt Injection and Agent Security}{subsection.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Persistent and Cross-Session Attacks}{2}{subsection.2.3}\protected@file@percent }
+\newlabel{subsec:rw-persistent-attacks}{{2.3}{2}{Persistent and Cross-Session Attacks}{subsection.2.3}{}}
+\citation{park2023generative}
+\citation{packer2024memgpt}
+\citation{wu2023autogen}
+\citation{pasquier2017camflow}
+\citation{guo2020certified}
+\citation{neel2021descent}
+\citation{eldan2023harrypotter}
+\citation{lynch2024eight}
+\citation{liang2023helm}
+\citation{liu2024agentbench}
+\citation{ocallahan2017rr}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Memory-Enabled Agent Architectures}{3}{subsection.2.4}\protected@file@percent }
+\newlabel{subsec:rw-memory-agents}{{2.4}{3}{Memory-Enabled Agent Architectures}{subsection.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Provenance, Traceability, and Auditability}{3}{subsection.2.5}\protected@file@percent }
+\newlabel{subsec:rw-provenance}{{2.5}{3}{Provenance, Traceability, and Auditability}{subsection.2.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Machine Unlearning and Forgetting}{3}{subsection.2.6}\protected@file@percent }
+\newlabel{subsec:rw-unlearning}{{2.6}{3}{Machine Unlearning and Forgetting}{subsection.2.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.7}Longitudinal Evaluation and Reproducibility}{3}{subsection.2.7}\protected@file@percent }
+\newlabel{subsec:rw-longitudinal-repro}{{2.7}{3}{Longitudinal Evaluation and Reproducibility}{subsection.2.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.8}PersistBench Positioning Summary}{3}{subsection.2.8}\protected@file@percent }
+\newlabel{subsec:rw-positioning-summary}{{2.8}{3}{PersistBench Positioning Summary}{subsection.2.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Threat Model}{4}{section.3}\protected@file@percent }
+\newlabel{sec:threat-model}{{3}{4}{Threat Model}{section.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Attacker objective.}{4}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Attacker capabilities.}{4}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Attacker knowledge.}{4}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Attacker position by suite.}{4}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Persistence definition.}{4}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Out-of-scope capabilities.}{4}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Evaluation perspective.}{4}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Benchmark Design and Architecture}{4}{section.4}\protected@file@percent }
+\newlabel{sec:architecture}{{4}{4}{Benchmark Design and Architecture}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Pipeline Overview}{4}{subsection.4.1}\protected@file@percent }
+\newlabel{subsec:architecture-overview}{{4.1}{4}{Pipeline Overview}{subsection.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Replay Engine}{4}{subsection.4.2}\protected@file@percent }
+\newlabel{subsec:replay-engine}{{4.2}{4}{Replay Engine}{subsection.4.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Architecture overview of \textsc  {PersistBench}{}. Scenario YAML is converted into a seeded replay trace, executed by the replay engine under a selected defense configuration, evaluated with provenance-aware metrics and forgetting checks, and written to durable analytical artifacts.}}{5}{figure.caption.12}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:architecture}{{1}{5}{Architecture overview of \benchmark {}. Scenario YAML is converted into a seeded replay trace, executed by the replay engine under a selected defense configuration, evaluated with provenance-aware metrics and forgetting checks, and written to durable analytical artifacts}{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Defense Middleware}{5}{subsection.4.3}\protected@file@percent }
+\newlabel{subsec:defense-middleware}{{4.3}{5}{Defense Middleware}{subsection.4.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Provenance DAG}{5}{subsection.4.4}\protected@file@percent }
+\newlabel{subsec:provenance-dag}{{4.4}{5}{Provenance DAG}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}DuckDB Analytical Layer}{6}{subsection.4.5}\protected@file@percent }
+\newlabel{subsec:duckdb-layer}{{4.5}{6}{DuckDB Analytical Layer}{subsection.4.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Provenance and Trustworthy Forgetting}{6}{section.5}\protected@file@percent }
+\newlabel{sec:provenance-forgetting}{{5}{6}{Provenance and Trustworthy Forgetting}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Provenance as an Evaluation Primitive}{6}{subsection.5.1}\protected@file@percent }
+\newlabel{subsec:provenance-eval-primitive}{{5.1}{6}{Provenance as an Evaluation Primitive}{subsection.5.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Adversarial fragment lifecycle. A fragment is created, retrieved, and consolidated into a derived summary before the trigger session reactivates it. Nominal deletion removes the original entry, but the derived descendant (dashed purple) persists, demonstrating incomplete forgetting across five resurfacing pathways tested by \textsc  {FVS}{}-1--15.}}{6}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:provenance-lifecycle}{{2}{6}{Adversarial fragment lifecycle. A fragment is created, retrieved, and consolidated into a derived summary before the trigger session reactivates it. Nominal deletion removes the original entry, but the derived descendant (dashed purple) persists, demonstrating incomplete forgetting across five resurfacing pathways tested by \fvs {}-1--15}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Trustworthy Forgetting}{6}{subsection.5.2}\protected@file@percent }
+\newlabel{subsec:trustworthy-forgetting}{{5.2}{6}{Trustworthy Forgetting}{subsection.5.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Backend Dependence and Skipped-State Transparency}{6}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:fvs-transparency}{{5.3}{6}{Backend Dependence and Skipped-State Transparency}{subsection.5.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Resurfacing pathways covered by \textsc  {FVS}{}-1--15.}}{7}{table.caption.14}\protected@file@percent }
+\newlabel{tab:fvs-pathways}{{1}{7}{Resurfacing pathways covered by \fvs {}-1--15}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Semantic Ghosts}{7}{subsection.5.4}\protected@file@percent }
+\newlabel{subsec:semantic-ghosts}{{5.4}{7}{Semantic Ghosts}{subsection.5.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Benchmark Suites}{7}{section.6}\protected@file@percent }
+\newlabel{sec:suites}{{6}{7}{Benchmark Suites}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Metric Definitions}{7}{section.7}\protected@file@percent }
+\newlabel{sec:metrics}{{7}{7}{Metric Definitions}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Primary Metrics}{7}{subsection.7.1}\protected@file@percent }
+\newlabel{subsec:primary-metrics}{{7.1}{7}{Primary Metrics}{subsection.7.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Attack Persistence Score (\textsc  {APS}{}).}{7}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Recovery Latency Score (\textsc  {RLS}{}).}{7}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Utility Preservation Score (\textsc  {UPS}{}).}{7}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Composite score.}{8}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Complementary Metrics}{8}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:secondary-metrics}{{7.2}{8}{Complementary Metrics}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Behavioral Drift Index (\textsc  {BDI}{}).}{8}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Forgetting Validation Score (\textsc  {FVS}{}).}{8}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Conflict Resolution Accuracy (\textsc  {CRA}{}).}{8}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Metric Wording Constraints}{8}{subsection.7.3}\protected@file@percent }
+\newlabel{subsec:metric-wording}{{7.3}{8}{Metric Wording Constraints}{subsection.7.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Experimental Setup}{8}{section.8}\protected@file@percent }
+\newlabel{sec:experimental-setup}{{8}{8}{Experimental Setup}{section.8}{}}
+\@writefile{toc}{\contentsline {paragraph}{Artifact availability.}{8}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Results}{8}{section.9}\protected@file@percent }
+\newlabel{sec:results}{{9}{8}{Results}{section.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Cross-Suite Defense Differentiation}{8}{subsection.9.1}\protected@file@percent }
+\newlabel{subsec:results-defense-diff}{{9.1}{8}{Cross-Suite Defense Differentiation}{subsection.9.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Canonical deterministic cross-suite results over 77 scenarios and 7 defenses under seeded \texttt  {EchoBackend} replay. Defense labels: CD, DEV, MW, PLS, PS, TOH, NoDef. FVS is reported as a percentage of the effective executed forgetting tests.}}{9}{table.caption.23}\protected@file@percent }
+\newlabel{tab:canonical-cross-suite}{{2}{9}{Canonical deterministic cross-suite results over 77 scenarios and 7 defenses under seeded \texttt {EchoBackend} replay. Defense labels: CD, DEV, MW, PLS, PS, TOH, NoDef. FVS is reported as a percentage of the effective executed forgetting tests}{table.caption.23}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Overall defense comparison on the completed canonical deterministic matrix. CompositeDefense and DualExecutionVerification form the leading tier, while the remaining defenses cluster closer to the undefended baseline.}}{9}{figure.caption.24}\protected@file@percent }
+\newlabel{fig:defense-comparison}{{3}{9}{Overall defense comparison on the completed canonical deterministic matrix. CompositeDefense and DualExecutionVerification form the leading tier, while the remaining defenses cluster closer to the undefended baseline}{figure.caption.24}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Representative longitudinal trajectory from the canonical matrix (\texttt  {sbmp-001}) showing adversarial-memory accumulation across sessions. CompositeDefense limits growth after the first planted fragment, while NoDefense allows continued accumulation through later attack sessions.}}{9}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:attack-evolution-dashboard}{{4}{9}{Representative longitudinal trajectory from the canonical matrix (\texttt {sbmp-001}) showing adversarial-memory accumulation across sessions. CompositeDefense limits growth after the first planted fragment, while NoDefense allows continued accumulation through later attack sessions}{figure.caption.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Deterministic Replay Findings}{9}{subsection.9.2}\protected@file@percent }
+\newlabel{subsec:results-calibration}{{9.2}{9}{Deterministic Replay Findings}{subsection.9.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Utility-Security Tradeoff}{10}{subsection.9.3}\protected@file@percent }
+\newlabel{subsec:results-tradeoff}{{9.3}{10}{Utility-Security Tradeoff}{subsection.9.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Ablation}{10}{section.10}\protected@file@percent }
+\newlabel{sec:ablation}{{10}{10}{Ablation}{section.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}Composite Weight Sensitivity}{10}{subsection.10.1}\protected@file@percent }
+\newlabel{subsec:ablation-weights}{{10.1}{10}{Composite Weight Sensitivity}{subsection.10.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}Defense Threshold Sweeps}{10}{subsection.10.2}\protected@file@percent }
+\newlabel{subsec:ablation-thresholds}{{10.2}{10}{Defense Threshold Sweeps}{subsection.10.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}Minimum Viable Ablation Set}{10}{subsection.10.3}\protected@file@percent }
+\newlabel{subsec:ablation-minimum}{{10.3}{10}{Minimum Viable Ablation Set}{subsection.10.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Limitations}{10}{section.11}\protected@file@percent }
+\newlabel{sec:limitations}{{11}{10}{Limitations}{section.11}{}}
+\@writefile{toc}{\contentsline {paragraph}{Synthetic scenarios rather than real-world traces.}{10}{section*.26}\protected@file@percent }
+\bibstyle{ACM-Reference-Format}
+\bibdata{references}
+\bibcite{chen2024agentpoison}{{1}{2024}{{Chen et~al\mbox  {.}}}{{}}}
+\bibcite{debenedetti2024agentdojo}{{2}{2024}{{Debenedetti et~al\mbox  {.}}}{{}}}
+\bibcite{dong2025minja}{{3}{2025}{{Dong et~al\mbox  {.}}}{{}}}
+\bibcite{eldan2023harrypotter}{{4}{2023}{{Eldan and Russinovich}}{{}}}
+\bibcite{greshake2023indirect}{{5}{2023}{{Greshake et~al\mbox  {.}}}{{}}}
+\bibcite{guo2020certified}{{6}{2020}{{Guo et~al\mbox  {.}}}{{}}}
+\bibcite{hines2024spotlighting}{{7}{2024}{{Hines et~al\mbox  {.}}}{{}}}
+\bibcite{jimenez2024swebench}{{8}{2024}{{Jimenez et~al\mbox  {.}}}{{}}}
+\bibcite{liang2023helm}{{9}{2023}{{Liang et~al\mbox  {.}}}{{}}}
+\bibcite{liu2024agentbench}{{10}{2024}{{Liu et~al\mbox  {.}}}{{}}}
+\@writefile{toc}{\contentsline {paragraph}{EchoBackend as oracle baseline.}{11}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Partial forgetting coverage in the default configuration.}{11}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Limited live-model evidence.}{11}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Long-horizon evaluation remains limited.}{11}{section*.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Defense set breadth.}{11}{section*.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Heuristic and saturated signals.}{11}{section*.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {12}Ethics}{11}{section.12}\protected@file@percent }
+\newlabel{sec:ethics}{{12}{11}{Ethics}{section.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {13}Conclusion}{11}{section.13}\protected@file@percent }
+\newlabel{sec:conclusion}{{13}{11}{Conclusion}{section.13}{}}
+\@writefile{toc}{\contentsline {section}{References}{11}{section*.34}\protected@file@percent }
+\bibcite{lynch2024eight}{{11}{2024}{{Lynch et~al\mbox  {.}}}{{}}}
+\bibcite{mazeika2024harmbench}{{12}{2024}{{Mazeika et~al\mbox  {.}}}{{}}}
+\bibcite{neel2021descent}{{13}{2021}{{Neel et~al\mbox  {.}}}{{}}}
+\bibcite{ocallahan2017rr}{{14}{2017}{{O'Callahan et~al\mbox  {.}}}{{}}}
+\bibcite{packer2024memgpt}{{15}{2024}{{Packer et~al\mbox  {.}}}{{}}}
+\bibcite{park2023generative}{{16}{2023}{{Park et~al\mbox  {.}}}{{}}}
+\bibcite{pasquier2017camflow}{{17}{2017}{{Pasquier et~al\mbox  {.}}}{{}}}
+\bibcite{qin2023toolllm}{{18}{2023}{{Qin et~al\mbox  {.}}}{{}}}
+\bibcite{wu2023autogen}{{19}{2023}{{Wu et~al\mbox  {.}}}{{}}}
+\bibcite{yi2025bipia}{{20}{2025}{{Yi et~al\mbox  {.}}}{{}}}
+\bibcite{zhu2024promptbench}{{21}{2024}{{Zhu et~al\mbox  {.}}}{{}}}
+\newlabel{tocindent-1}{0pt}
+\newlabel{tocindent0}{0pt}
+\newlabel{tocindent1}{8.37pt}
+\newlabel{tocindent2}{14.53499pt}
+\newlabel{tocindent3}{0pt}
+\newlabel{tocindent4}{0pt}
+\newlabel{tocindent5}{0pt}
+\newlabel{TotPages}{{12}{12}{}{page.12}{}}
+\gdef \@abspage@last{12}
